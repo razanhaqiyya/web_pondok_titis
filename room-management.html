@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        if (localStorage.getItem('pt_isAdmin') !== 'true') {
+            window.location.href = 'user.html';
+        }
+    </script>
+    <title>Pondok Titis - Manajemen Kamar</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <!-- Google Fonts for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Pondok Titis</h2>
+            </div>
+            
+            <div class="admin-profile">
+                <div class="avatar">A</div>
+                <div class="admin-info">
+                    <span class="admin-name">System Admin</span>
+                    <span class="admin-role">Administrator</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html">Dasbor</a></li>
+                    <li class="active"><a href="room-management.html">Manajemen Kamar</a></li>
+                    <li><a href="tenant-data.html">Detail Penyewa</a></li>
+                    <li><a href="payments.html">Pembayaran</a></li>
+                    <li><a href="reports.html">Reports</a></li>
+                    <li><a href="settings.html">Pengaturan</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn">Keluar</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="date-display" id="currentDate">
+                    Minggu, 24 Mei 2026
+                </div>
+            </header>
+
+            <!-- Room Management Content -->
+            <div class="content-wrapper">
+                
+                <!-- Room Mgmt Top Bar -->
+                <div class="room-mgmt-header">
+                    <div class="room-mgmt-title">Manajemen Kamar</div>
+                    
+                    <div class="room-mgmt-actions">
+                        <div class="search-input-wrapper">
+                            <input type="text" id="searchRoom" class="search-input" placeholder="Cari tipe atau nomor kamar...">
+                        </div>
+                        
+                        <select id="filterLocation" class="filter-select">
+                            <option value="all">Semua Lokasi</option>
+                            <option value="bandung">Bandung</option>
+                            <option value="solo">Solo</option>
+                        </select>
+
+                        <select id="filterStatus" class="filter-select">
+                            <option value="all">Semua Status</option>
+                            <option value="Tersedia">Tersedia</option>
+                            <option value="Terisi">Terisi</option>
+                            <option value="Sedang Perbaikan">Sedang Perbaikan</option>
+                            <option value="Tidak Tersedia">Akan Datang</option>
+                        </select>
+
+                        <button class="btn-add-room" id="btnOpenAddModal">
+                            + Tambah Kamar Baru
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Summary Row -->
+                <div class="mgmt-stats">
+                    <div class="mgmt-stat-card">
+                        <span class="mgmt-stat-title">Total Kamar</span>
+                        <span class="mgmt-stat-val" id="statTotalRooms">0</span>
+                    </div>
+                    <div class="mgmt-stat-card">
+                        <span class="mgmt-stat-title">Tersedia (Kosong)</span>
+                        <span class="mgmt-stat-val" id="statAvailableRooms" style="color: #15803d;">0</span>
+                    </div>
+                    <div class="mgmt-stat-card">
+                        <span class="mgmt-stat-title">Terisi (Occupied)</span>
+                        <span class="mgmt-stat-val" id="statOccupiedRooms" style="color: #1e40af;">0</span>
+                    </div>
+                    <div class="mgmt-stat-card">
+                        <span class="mgmt-stat-title">Sedang Perbaikan</span>
+                        <span class="mgmt-stat-val" id="statMaintenanceRooms" style="color: #b91c1c;">0</span>
+                    </div>
+                    <div class="mgmt-stat-card">
+                        <span class="mgmt-stat-title">Akan Datang</span>
+                        <span class="mgmt-stat-val" id="statComingRooms" style="color: #b45309;">0</span>
+                    </div>
+                </div>
+
+                <!-- Rooms Card Grid -->
+                <div class="rooms-grid" id="roomsGrid">
+                    <!-- Cards will be dynamically generated by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==========================================
+         ADD/EDIT ROOM MODAL
+         ========================================== -->
+    <div class="admin-modal" id="roomModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tambah Kamar Baru</h3>
+                <button class="btn-close-modal" id="btnCloseModal">&times;</button>
+            </div>
+            
+            <form id="roomForm" onsubmit="return false;">
+                <div class="modal-body">
+                    <div class="form-grid">
+                        
+                        <!-- Hidden ID for edit mode -->
+                        <input type="hidden" id="editRoomId">
+
+                        <!-- Lokasi -->
+                        <div class="form-group form-full-width">
+                            <label>Lokasi</label>
+                            <div class="radio-group-horizontal">
+                                <label class="radio-option">
+                                    <input type="radio" name="roomLocation" value="bandung" checked> Bandung
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="roomLocation" value="solo"> Solo
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Tipe Kamar -->
+                        <div class="form-group">
+                            <label for="roomType">Tipe Kamar</label>
+                            <select id="roomType" class="form-select">
+                                <option value="standar" selected>Standar</option>
+                                <option value="deluxe">Deluxe</option>
+                                <option value="vip">VIP</option>
+                            </select>
+                        </div>
+
+                        <!-- Nomor Kamar (Auto-Generated) -->
+                        <div class="form-group">
+                            <label for="roomNumber">Nomor Kamar (Otomatis)</label>
+                            <input type="text" id="roomNumber" class="form-input" disabled value="BDG-S01">
+                        </div>
+
+                        <!-- Judul Kamar -->
+                        <div class="form-group form-full-width">
+                            <label for="roomTitle">Judul Kamar</label>
+                            <input type="text" id="roomTitle" class="form-input" placeholder="Masukkan judul kamar (misal: Kamar Standar Cozy)" required>
+                        </div>
+
+                        <!-- Harga Kamar (Jutaan) -->
+                        <div class="form-group">
+                            <label for="roomPrice">Harga Kamar (Juta Rupiah / tahun)</label>
+                            <input type="number" id="roomPrice" class="form-input" placeholder="misal: 13.5" step="0.1" min="1" required>
+                            <div class="price-formatted-preview" id="pricePreview">Pratinjau: Rp 13.500.000 / tahun</div>
+                        </div>
+
+                        <!-- Ukuran Kamar -->
+                        <div class="form-group">
+                            <label for="roomSize">Ukuran Kamar</label>
+                            <input type="text" id="roomSize" class="form-input" placeholder="misal: 3x3 meter" required>
+                        </div>
+
+                        <!-- Lantai -->
+                        <div class="form-group">
+                            <label for="roomFloor">Lantai</label>
+                            <select id="roomFloor" class="form-select">
+                                <option value="1" selected>Lantai 1</option>
+                                <option value="2">Lantai 2</option>
+                                <option value="3">Lantai 3</option>
+                                <option value="4">Lantai 4</option>
+                            </select>
+                        </div>
+
+                        <!-- Status Awal -->
+                        <div class="form-group">
+                            <label>Status Kamar</label>
+                            <div class="radio-group-horizontal" style="padding-top: 8px;">
+                                <label class="radio-option">
+                                    <input type="radio" name="roomStatus" value="Tersedia" checked> Tersedia
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="roomStatus" value="Terisi"> Terisi
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="roomStatus" value="Sedang Perbaikan"> Maintenance
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="roomStatus" value="Tidak Tersedia"> Akan Datang
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Deskripsi Kamar -->
+                        <div class="form-group form-full-width">
+                            <label for="roomDescription">Deskripsi Kamar</label>
+                            <textarea id="roomDescription" class="form-textarea" rows="3" placeholder="Masukkan deskripsi detail fasilitas dan kelebihan kamar..."></textarea>
+                        </div>
+
+                        <!-- Fasilitas Kamar -->
+                        <div class="form-group form-full-width">
+                            <label>Fasilitas Kamar</label>
+                            <div class="facilities-container">
+                                <div class="facilities-grid" id="facilitiesGrid">
+                                    <!-- Standard Facility Checkboxes -->
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="AC" checked> AC</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Kipas Angin"> Kipas Angin</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Kasur" checked> Kasur</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Lemari"> Lemari</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Meja" checked> Meja</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Kursi"> Kursi</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Jendela"> Jendela</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Kamar Mandi Dalam"> KM Dalam</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Kamar Mandi Luar"> KM Luar</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Heater"> Heater</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Shower"> Shower</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="WiFi Pribadi"> WiFi Pribadi</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Kulkas"> Kulkas</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="Balkon"> Balkon</label>
+                                    <label class="facility-checkbox-label"><input type="checkbox" value="CCTV"> CCTV</label>
+                                </div>
+                                
+                                <!-- Custom facility additions -->
+                                <div class="custom-facility-wrapper">
+                                    <input type="text" id="txtCustomFacility" class="custom-facility-input" placeholder="Nama fasilitas kustom baru...">
+                                    <button type="button" class="btn-add-custom-facility" id="btnAddCustomFacility">Tambah</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Foto Kamar Upload -->
+                        <div class="form-group form-full-width">
+                            <label>Foto Kamar</label>
+                            
+                            <!-- Hidden input field -->
+                            <input type="file" id="roomPhotoInput" accept="image/*" style="display: none;">
+                            
+                            <!-- Custom upload UI dropzone -->
+                            <div class="image-upload-area" id="imgUploadDropzone">
+                                <div class="image-upload-placeholder" id="uploadPlaceholder">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                    <span class="text">Klik atau seret gambar ke sini untuk mengunggah</span>
+                                </div>
+                                <div class="image-preview-wrapper" id="previewWrapper">
+                                    <img src="" id="uploadPreview" class="image-preview-img">
+                                    <button type="button" class="btn-remove-image" id="btnRemoveImage">&times;</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-form btn-form-cancel" id="btnCancelForm">Batal</button>
+                    <button type="submit" class="btn-form btn-form-save" id="btnSaveRoom">Simpan Kamar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JS dependencies -->
+    <script src="js/room-management.js"></script>
+</body>
+</html>

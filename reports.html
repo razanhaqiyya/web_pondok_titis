@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        if (localStorage.getItem('pt_isAdmin') !== 'true') {
+            window.location.href = 'user.html';
+        }
+    </script>
+    <title>Pondok Titis - Reports & Analytics</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <!-- Google Fonts for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js dependency for occupancy pie charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Pondok Titis</h2>
+            </div>
+            
+            <div class="admin-profile">
+                <div class="avatar">A</div>
+                <div class="admin-info">
+                    <span class="admin-name">System Admin</span>
+                    <span class="admin-role">Administrator</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html">Dasbor</a></li>
+                    <li><a href="room-management.html">Manajemen Kamar</a></li>
+                    <li><a href="tenant-data.html">Detail Penyewa</a></li>
+                    <li><a href="payments.html">Pembayaran</a></li>
+                    <li class="active"><a href="reports.html">Reports</a></li>
+                    <li><a href="settings.html">Pengaturan</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn">Keluar</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header no-print">
+                <div class="date-display" id="currentDate">
+                    Minggu, 24 Mei 2026
+                </div>
+            </header>
+
+            <!-- Reports & Analytics Content -->
+            <div class="content-wrapper">
+                
+                <!-- Page Title & Actions Panel -->
+                <div class="room-mgmt-header no-print">
+                    <div class="room-mgmt-title">Reports & Analytics</div>
+                    
+                    <div class="room-mgmt-actions">
+                        <button class="view-all-btn" id="btnExportAnalytics" style="padding: 8px 16px; font-size: 13px; font-weight: 600;">
+                            Export Excel (CSV)
+                        </button>
+                        <button class="btn-add-room" id="btnPrintReport" style="padding: 8px 16px; font-size: 13px; font-weight: 600;">
+                            Print Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Printable Report Header (Only visible when printing) -->
+                <div class="print-only-header" style="display: none; margin-bottom: 24px; border-bottom: 2px solid #0f172a; padding-bottom: 12px;">
+                    <h1 style="color: #0f172a; margin: 0; font-size: 26px; font-weight: 800;">LAPORAN ANALIS KEUANGAN & OKUPANSI</h1>
+                    <h2 style="color: #db2777; margin: 4px 0 0 0; font-size: 16px; font-weight: 700;">Pondok Titis Kos Putri Nyaman</h2>
+                    <p style="margin: 6px 0 0 0; font-size: 12px; color: #475569;" id="printDate">Tanggal Laporan: Minggu, 24 Mei 2026</p>
+                </div>
+
+                <!-- Main Analysis Content Panels (Flex Two Columns) -->
+                <div class="charts-section" style="margin-bottom: 24px;">
+                    
+                    <!-- Revenue Summary Card -->
+                    <div class="chart-card">
+                        <h3 style="font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px;">
+                            Revenue Summary
+                        </h3>
+                        
+                        <!-- Consolidated Branches Earnings -->
+                        <div class="split-value" style="margin-bottom: 16px; background-color: var(--bg); padding: 12px; border-radius: 8px;">
+                            <div class="loc-val">
+                                <span class="loc-name">Pendapatan Bandung:</span>
+                                <span class="value" id="repRevenueBdg" style="color: var(--text); font-weight: 700;">Rp 0</span>
+                            </div>
+                            <div class="loc-val">
+                                <span class="loc-name">Pendapatan Solo:</span>
+                                <span class="value" id="repRevenueSolo" style="color: var(--text); font-weight: 700;">Rp 0</span>
+                            </div>
+                            <div class="loc-val" style="border-top: 1px solid var(--border); border-bottom: none; padding-top: 8px; margin-top: 4px;">
+                                <span class="loc-name" style="font-weight: 700; color: var(--text);">Total Revenue Gabungan:</span>
+                                <span class="value" id="repTotalRevenue" style="color: var(--primary); font-size: 18px !important; font-weight: 800;">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Simulated Monthly breakdown table -->
+                        <div class="table-container">
+                            <h4 style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Rincian Bulanan (Tahun Ini)</h4>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Bulan</th>
+                                        <th>Bandung</th>
+                                        <th>Solo</th>
+                                        <th style="text-align: right;">Total Bulanan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="monthlyRevenueBody">
+                                    <!-- Dynamic Rows populated by JS -->
+                                    <tr>
+                                        <td colspan="4" class="empty-state">Menyusun rincian keuangan...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Occupancy Summary Card (Pie/Doughnut Charts) -->
+                    <div class="chart-card" style="justify-content: flex-start;">
+                        <h3 style="font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px;">
+                            Occupancy Summary
+                        </h3>
+
+                        <!-- Overall Stats Info badge -->
+                        <div class="split-value" style="margin-bottom: 20px; background-color: var(--bg); padding: 12px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; align-items: center;">
+                            <span class="value" id="repOverallRate" style="font-size: 32px !important; font-weight: 800; color: var(--primary);">0%</span>
+                            <span class="loc-name" style="font-weight: 600; font-size: 13px;">Rata-Rata Okupansi Keseluruhan</span>
+                            <span class="loc-name" id="repOccupiedFraction" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">0 dari 0 kamar terisi</span>
+                        </div>
+
+                        <!-- Two Pie/Doughnut Canvases Side-by-Side -->
+                        <div style="display: flex; gap: 16px; flex-wrap: wrap; width: 100%; justify-content: space-around;">
+                            
+                            <!-- Bandung Pie Chart wrapper -->
+                            <div style="text-align: center; width: 180px;">
+                                <h4 style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px;">Cabang Bandung</h4>
+                                <div style="position: relative; height: 140px; width: 100%;">
+                                    <canvas id="occupancyChartBdg"></canvas>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px; font-weight: 500;" id="txtFractionBdg">0 / 0 Kamar</div>
+                            </div>
+
+                            <!-- Solo Pie Chart wrapper -->
+                            <div style="text-align: center; width: 180px;">
+                                <h4 style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px;">Cabang Solo</h4>
+                                <div style="position: relative; height: 140px; width: 100%;">
+                                    <canvas id="occupancyChartSolo"></canvas>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px; font-weight: 500;" id="txtFractionSolo">0 / 0 Kamar</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Printable custom stylesheet additions (Only applied on Ctrl+P) -->
+    <style>
+        @media print {
+            body {
+                background-color: white !important;
+                color: black !important;
+                font-size: 12px !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .sidebar {
+                display: none !important;
+            }
+            .main-content {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .content-wrapper {
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            .print-only-header {
+                display: block !important;
+            }
+            .chart-card {
+                border: 1px solid #cbd5e1 !important;
+                box-shadow: none !important;
+                break-inside: avoid !important;
+                margin-bottom: 16px !important;
+            }
+            .charts-section {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+            }
+            .data-table th {
+                background-color: #f1f5f9 !important;
+                border-bottom: 2px solid #94a3b8 !important;
+            }
+            .split-value {
+                background-color: #f8fafc !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+        }
+    </style>
+
+    <!-- JS dependencies -->
+    <script src="js/reports.js"></script>
+</body>
+</html>

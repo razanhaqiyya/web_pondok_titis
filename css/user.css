@@ -1,0 +1,251 @@
+/* ========== ADDITIONAL LIQUID CRYSTAL STYLES ========== */
+
+/* Glass morphism cards */
+.room-card,
+.modal-content,
+.user-dropdown,
+.filter-bar-location select {
+    backdrop-filter: blur(0px);
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+.room-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px var(--shadow);
+}
+
+/* Step indicator for payment */
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.step-dot {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.step-dot.active {
+    background: var(--primary);
+    width: 60px;
+}
+
+/* Payment step visibility */
+.payment-step {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.payment-step.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Button animations */
+.button-primary-sm {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.button-primary-sm:active {
+    transform: scale(0.95);
+}
+
+/* Glass button secondary */
+.glass-btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 12px 24px;
+    border-radius: 40px;
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.glass-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Badge styles */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.guest-favorite-badge {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    color: white;
+}
+
+/* Facility grid */
+.facility-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.facility-grid span {
+    background: var(--bg-section);
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 13px;
+}
+
+/* Reviews section */
+.reviews-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.review-card {
+    background: var(--bg-section);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+}
+
+.review-name {
+    font-weight: 600;
+}
+
+.review-date {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* Checkbox & Radio styling */
+input[type="radio"],
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+}
+
+/* Dark mode toggle animation */
+#btnThemeToggle {
+    transition: transform 0.3s ease;
+}
+
+#btnThemeToggle:active {
+    transform: rotate(180deg);
+}
+
+/* Loading spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Toast notification */
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--bg-card);
+    color: var(--text);
+    padding: 12px 24px;
+    border-radius: 60px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    z-index: 10001;
+    transition: transform 0.3s ease;
+    font-weight: 500;
+    border: 1px solid var(--border);
+}
+
+.toast-notification.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ========== DARK MODE SPECIFIC ========== */
+[data-theme="dark"] .room-card {
+    background: var(--bg-card);
+}
+
+[data-theme="dark"] .glass-navbar {
+    background: rgba(30, 41, 59, 0.8);
+}
+
+[data-theme="dark"] .modal-content {
+    background: var(--bg-card);
+}
+
+/* ========== RESPONSIVE FIXES ========== */
+@media (max-width: 640px) {
+    .modal-content {
+        width: 95vw;
+        margin: 16px;
+    }
+
+    .hero-text h1 {
+        font-size: 1.2rem;
+    }
+
+    .filter-bar-location {
+        flex-direction: column;
+    }
+
+    .filter-bar-location select {
+        width: 100%;
+    }
+}

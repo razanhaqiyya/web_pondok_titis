@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        if (localStorage.getItem('pt_isAdmin') !== 'true') {
+            window.location.href = 'user.html';
+        }
+    </script>
+    <title>Pondok Titis - Pengaturan Sistem</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <!-- Google Fonts for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Pondok Titis</h2>
+            </div>
+            
+            <div class="admin-profile">
+                <div class="avatar">A</div>
+                <div class="admin-info">
+                    <span class="admin-name">System Admin</span>
+                    <span class="admin-role">Administrator</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html">Dasbor</a></li>
+                    <li><a href="room-management.html">Manajemen Kamar</a></li>
+                    <li><a href="tenant-data.html">Detail Penyewa</a></li>
+                    <li><a href="payments.html">Pembayaran</a></li>
+                    <li><a href="reports.html">Reports</a></li>
+                    <li class="active"><a href="settings.html">Pengaturan</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn">Keluar</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="date-display" id="currentDate">
+                    Minggu, 24 Mei 2026
+                </div>
+            </header>
+
+            <!-- Settings & Configuration Content -->
+            <div class="content-wrapper">
+                
+                <!-- Page Title -->
+                <div class="room-mgmt-header" style="margin-bottom: 20px;">
+                    <div class="room-mgmt-title">Pengaturan Sistem</div>
+                    <div class="room-mgmt-actions">
+                        <button class="btn-add-room" id="btnSaveAllSettings" style="background-color: #22c55e; gap: 8px; padding: 10px 20px;">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Forms Grid Container (Two Branches Side-by-Side) -->
+                <div class="charts-section" style="grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px; margin-bottom: 24px;">
+                    
+                    <!-- Bandung Configuration Card -->
+                    <div class="chart-card" style="padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                        <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <div>
+                                <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text);">Cabang Bandung</h3>
+                                <span style="font-size: 11px; color: var(--text-muted);">Konfigurasi nama, WA, & peta cabang Bandung</span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Nama Kos Bandung</label>
+                                <input type="text" id="setBdgName" class="search-input" style="width: 100%;" placeholder="Pondok Titis Bandung">
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Nomor WhatsApp Admin (Dengan Kode Negara 62)</label>
+                                <input type="text" id="setBdgPhone" class="search-input" style="width: 100%;" placeholder="Contoh: 6285128067691">
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Alamat Lengkap Bandung</label>
+                                <textarea id="setBdgAddress" class="search-input" style="width: 100%; height: 70px; resize: none; font-family: inherit;" placeholder="Jl. Jayasari No. 34, Bojongsoang, Bandung"></textarea>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Google Maps Embed (src Iframe)</label>
+                                <textarea id="setBdgMapsIframe" class="search-input" style="width: 100%; height: 70px; resize: none; font-family: inherit; font-size: 11px;" placeholder="URL dari iframe src Google Maps"></textarea>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Google Maps Search Link (href Button)</label>
+                                <input type="text" id="setBdgMapsLink" class="search-input" style="width: 100%; font-size: 11px;" placeholder="URL pencarian Google Maps">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Solo Configuration Card -->
+                    <div class="chart-card" style="padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                        <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <div>
+                                <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text);">Cabang Solo</h3>
+                                <span style="font-size: 11px; color: var(--text-muted);">Konfigurasi nama, WA, & peta cabang Solo</span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Nama Kos Solo</label>
+                                <input type="text" id="setSoloName" class="search-input" style="width: 100%;" placeholder="Pondok Titis Solo">
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Nomor WhatsApp Admin (Dengan Kode Negara 62)</label>
+                                <input type="text" id="setSoloPhone" class="search-input" style="width: 100%;" placeholder="Contoh: 628987654321">
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Alamat Lengkap Solo</label>
+                                <textarea id="setSoloAddress" class="search-input" style="width: 100%; height: 70px; resize: none; font-family: inherit;" placeholder="Ketinggilan, Jebres, Surakarta, Jawa Tengah"></textarea>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Google Maps Embed (src Iframe)</label>
+                                <textarea id="setSoloMapsIframe" class="search-input" style="width: 100%; height: 70px; resize: none; font-family: inherit; font-size: 11px;" placeholder="URL dari iframe src Google Maps"></textarea>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Google Maps Search Link (href Button)</label>
+                                <input type="text" id="setSoloMapsLink" class="search-input" style="width: 100%; font-size: 11px;" placeholder="URL pencarian Google Maps">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Danger Zone Card -->
+                <div class="chart-card" style="border: 2px solid #fca5a5; background-color: #fef2f2; padding: 20px; border-radius: 12px; margin-top: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div style="flex-grow: 1; max-width: 800px;">
+                            <h3 style="color: #b91c1c; font-size: 16px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Zona Bahaya (Danger Zone)
+                            </h3>
+                            <p style="color: #7f1d1d; font-size: 13px; line-height: 1.5; margin: 0;">
+                                <strong>Reset Demo Data (Clear All)</strong> akan menghapus seluruh profil penyewa aktif, daftar kuitansi & riwayat pembayaran, notifikasi penolakan sewa, serta mengosongkan kontrak "Kamar Saya" di panel user. Logika sistem **TIDAK** akan menghapus bangunan fisik kamar melainkan akan mengeset ulang status seluruh kamar yang terisi kembali menjadi <strong>Tersedia (Kosong)</strong>.
+                            </p>
+                        </div>
+                        <div>
+                            <button id="btnResetData" class="btn-card-action" style="background-color: #ef4444; color: #fff; padding: 12px 24px; font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; min-width: 220px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.25);">
+                                Reset Demo Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- JS dependencies -->
+    <script src="js/settings.js"></script>
+</body>
+</html>
