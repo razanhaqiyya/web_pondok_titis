@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.querySelectorAll('.logout-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         localStorage.removeItem('pt_isAdmin');
-        window.location.href = 'user.html';
+        window.location.href = '/';
     });
 });
 
