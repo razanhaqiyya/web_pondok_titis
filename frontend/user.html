@@ -3993,7 +3993,7 @@
                 closeModal('loginModal');
                 alert(`Selamat datang ${data.user.name || email}!`);
             } catch (err) {
-                alert('Email atau password salah');
+                alert('Gagal: ' + err.message);
             }
         });
 
@@ -4029,7 +4029,7 @@
                     if (window.startWebTour) window.startWebTour();
                 }, 1000);
             } catch (err) {
-                alert('Gagal mendaftar: Email mungkin sudah terdaftar');
+                alert('Gagal: ' + err.message);
             }
         });
 
