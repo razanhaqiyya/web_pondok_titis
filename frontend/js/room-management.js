@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Global memory state for active rooms database
     let roomsDatabase = { bandung: [], solo: [] };
-    let tempImageBase64 = "";
 
     const fetchRooms = async () => {
         try {
