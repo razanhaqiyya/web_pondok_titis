@@ -4007,7 +4007,30 @@
                 alert('Password tidak cocok');
                 return;
             }
-            }, 1000);
+            try {
+                const res = await fetch('https://web-pondok-titis.onrender.com/api/users/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: fullname, email, password, phone })
+                });
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
+                
+                currentUser = data.user;
+                window.currentUser = data.user;
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                updateUI();
+                closeModal('registerModal');
+                alert('Pendaftaran berhasil!');
+
+                // Set flag for tour and trigger automatically with a small delay
+                localStorage.setItem('hasSeenWebTour', 'true');
+                setTimeout(() => {
+                    if (window.startWebTour) window.startWebTour();
+                }, 1000);
+            } catch (err) {
+                alert('Gagal mendaftar: Email mungkin sudah terdaftar');
+            }
         });
 
         document.getElementById('toRegister')?.addEventListener('click', (e) => {
