@@ -4036,7 +4036,11 @@
                     if (window.startWebTour) window.startWebTour();
                 }, 1000);
             } catch (err) {
-                alert('Gagal: ' + err.message);
+                if (err.message.includes('duplicate key') || err.message.includes('users_email_key')) {
+                    alert('Gagal: Email ini sudah terdaftar. Silakan gunakan email lain atau coba Login.');
+                } else {
+                    alert('Gagal: ' + err.message);
+                }
             }
         });
 

@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load or initialize data in localStorage
     const getRoomsData = () => {
         let data = localStorage.getItem('pt_rooms_data');
-        if (!data) {
+        if (!data || data === 'undefined') {
             const initialData = {
                 bandung: generateRooms('bandung'),
                 solo: generateRooms('solo')
@@ -77,7 +77,16 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('pt_rooms_data', JSON.stringify(initialData));
             return initialData;
         }
-        return JSON.parse(data);
+        try {
+            return JSON.parse(data);
+        } catch(e) {
+            const initialData = {
+                bandung: generateRooms('bandung'),
+                solo: generateRooms('solo')
+            };
+            localStorage.setItem('pt_rooms_data', JSON.stringify(initialData));
+            return initialData;
+        }
     };
 
     const saveRoomsData = (data) => {
