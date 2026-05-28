@@ -3630,10 +3630,17 @@
             localStorage.setItem('pt_rooms_data', JSON.stringify(roomsData));
         }
 
+        function safeJSONParse(key, fallback) {
+            try {
+                const val = localStorage.getItem(key);
+                if (val === 'undefined') return fallback;
+                return val ? JSON.parse(val) : fallback;
+            } catch(e) { return fallback; }
+        }
         var currentLocation = "bandung";
-        var currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-        var users = JSON.parse(localStorage.getItem('users')) || [];
-        var watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
+        var currentUser = safeJSONParse('currentUser', null);
+        var users = safeJSONParse('users', []);
+        var watchlist = safeJSONParse('watchlist', []);
 
         // Expose variables explicitly on the window object to be fully safe for external deferred scripts
         window.roomsData = roomsData;
@@ -3986,12 +3993,12 @@
                 if (!res.ok) throw new Error(await res.text());
                 const data = await res.json();
                 
-                currentUser = data.user;
-                window.currentUser = data.user;
-                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                currentUser = data;
+                window.currentUser = data;
+                localStorage.setItem('currentUser', JSON.stringify(data));
                 updateUI();
                 closeModal('loginModal');
-                alert(`Selamat datang ${data.user.name || email}!`);
+                alert(`Selamat datang ${data.name || email}!`);
             } catch (err) {
                 alert('Gagal: ' + err.message);
             }
@@ -4016,9 +4023,9 @@
                 if (!res.ok) throw new Error(await res.text());
                 const data = await res.json();
                 
-                currentUser = data.user;
-                window.currentUser = data.user;
-                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                currentUser = data;
+                window.currentUser = data;
+                localStorage.setItem('currentUser', JSON.stringify(data));
                 updateUI();
                 closeModal('registerModal');
                 alert('Pendaftaran berhasil!');
