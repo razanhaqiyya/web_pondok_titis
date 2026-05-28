@@ -3966,7 +3966,7 @@
         }
 
         // Event Listeners
-        document.getElementById('doLogin')?.addEventListener('click', () => {
+        document.getElementById('doLogin')?.addEventListener('click', async () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
@@ -3977,20 +3977,27 @@
                 return;
             }
 
-            const user = users.find(u => u.email === email && u.password === password);
-            if (user) {
-                currentUser = user;
-                window.currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(user));
+            try {
+                const res = await fetch('https://web-pondok-titis.onrender.com/api/users/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
+                
+                currentUser = data.user;
+                window.currentUser = data.user;
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
                 updateUI();
                 closeModal('loginModal');
-                alert(`Selamat datang ${user.fullname || email}!`);
-            } else {
+                alert(`Selamat datang ${data.user.name || email}!`);
+            } catch (err) {
                 alert('Email atau password salah');
             }
         });
 
-        document.getElementById('doRegister')?.addEventListener('click', () => {
+        document.getElementById('doRegister')?.addEventListener('click', async () => {
             const fullname = document.getElementById('regFullname').value;
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
@@ -4000,24 +4007,6 @@
                 alert('Password tidak cocok');
                 return;
             }
-            if (users.find(u => u.email === email)) {
-                alert('Email sudah terdaftar');
-                return;
-            }
-            const newUser = { fullname, email, password, phone };
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            currentUser = newUser;
-            window.currentUser = newUser;
-            localStorage.setItem('currentUser', JSON.stringify(newUser));
-            updateUI();
-            closeModal('registerModal');
-            alert('Pendaftaran berhasil!');
-
-            // Set flag for tour and trigger automatically with a small delay
-            localStorage.setItem('hasSeenWebTour', 'true');
-            setTimeout(() => {
-                if (window.startWebTour) window.startWebTour();
             }, 1000);
         });
 
