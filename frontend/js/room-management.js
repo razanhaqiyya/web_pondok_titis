@@ -269,7 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
             roomsGrid.appendChild(card);
         });
 
-        attachCardListeners();
     };
 
     // ==========================================
@@ -290,42 +289,41 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================
-    // CARD ACTION LISTENERS
+    // CARD ACTION LISTENERS (Event Delegation)
     // ==========================================
-    const attachCardListeners = () => {
-        roomsGrid.querySelectorAll('[data-action]').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const action = btn.getAttribute('data-action');
-                const id = parseInt(btn.getAttribute('data-id'), 10);
+    roomsGrid.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
 
-                if (action === 'edit') {
-                    openEditModal(id);
-                } else if (action === 'toggle-maint') {
-                    const room = [...roomsDatabase.bandung, ...roomsDatabase.solo].find(r => r.id === id);
-                    if (!room) return;
-                    const newStatus = room.status === 'Sedang Perbaikan' ? 'Tersedia' : 'Sedang Perbaikan';
-                    try {
-                        const res = await fetch(`${API_URL}/rooms/${id}`, {
-                            method: 'PUT', headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ status: newStatus })
-                        });
-                        if (!res.ok) throw new Error();
-                        fetchRooms();
-                    } catch { alert('Gagal mengubah status kamar.'); }
-                } else if (action === 'delete') {
-                    const room = [...roomsDatabase.bandung, ...roomsDatabase.solo].find(r => r.id === id);
-                    if (!room) return;
-                    if (confirm(`Hapus kamar "${room.number}"? Tindakan ini tidak bisa dibatalkan.`)) {
-                        try {
-                            const res = await fetch(`${API_URL}/rooms/${id}`, { method: 'DELETE' });
-                            if (!res.ok) throw new Error();
-                            fetchRooms();
-                        } catch { alert('Gagal menghapus kamar.'); }
-                    }
-                }
-            });
-        });
-    };
+        const action = btn.getAttribute('data-action');
+        const id = parseInt(btn.getAttribute('data-id'), 10);
+
+        if (action === 'edit') {
+            openEditModal(id);
+        } else if (action === 'toggle-maint') {
+            const room = [...roomsDatabase.bandung, ...roomsDatabase.solo].find(r => r.id === id);
+            if (!room) return;
+            const newStatus = room.status === 'Sedang Perbaikan' ? 'Tersedia' : 'Sedang Perbaikan';
+            try {
+                const res = await fetch(`${API_URL}/rooms/${id}`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (!res.ok) throw new Error();
+                fetchRooms();
+            } catch { alert('Gagal mengubah status kamar.'); }
+        } else if (action === 'delete') {
+            const room = [...roomsDatabase.bandung, ...roomsDatabase.solo].find(r => r.id === id);
+            if (!room) return;
+            if (confirm(`Hapus kamar "${room.number}"? Tindakan ini tidak bisa dibatalkan.`)) {
+                try {
+                    const res = await fetch(`${API_URL}/rooms/${id}`, { method: 'DELETE' });
+                    if (!res.ok) throw new Error();
+                    fetchRooms();
+                } catch { alert('Gagal menghapus kamar.'); }
+            }
+        }
+    });
 
     // ==========================================
     // MODAL OPEN / CLOSE
