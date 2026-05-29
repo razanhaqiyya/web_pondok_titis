@@ -109,7 +109,7 @@ app.get('/api/users', async (req, res) => {
     const { data, error } = await supabase
         .from('users')
         .select(`
-            id, name, email, role, phone, created_at,
+            id, name, email, role, created_at,
             rooms ( id, room_number, location, floor, type )
         `);
     if (error) return res.status(400).json({ error: error.message });
