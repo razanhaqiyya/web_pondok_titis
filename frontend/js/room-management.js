@@ -2,7 +2,7 @@ const API_URL = 'https://web-pondok-titis.onrender.com/api';
 let roomsDatabase = { bandung: [], solo: [] };
 let tempImageBase64 = "";
 
-document.addEventListener('DOMContentLoaded', () => {
+const init = () => {
 
     // ==========================================
     // DOM ELEMENTS
@@ -354,9 +354,11 @@ document.addEventListener('DOMContentLoaded', () => {
         roomDescription.value = room.description || '';
         roomPrice.value = room.price / 1000000;
         pricePreview.innerText = `Pratinjau: Rp ${room.price.toLocaleString('id-ID')} / tahun`;
-        document.querySelector(`input[name="roomLocation"][value="${room.location}"]`).checked = true;
+        const locRadio = document.querySelector(`input[name="roomLocation"][value="${room.location}"]`);
+        if (locRadio) locRadio.checked = true;
         roomType.value = room.type;
-        document.querySelector(`input[name="roomStatus"][value="${room.status}"]`).checked = true;
+        const statusRadio = document.querySelector(`input[name="roomStatus"][value="${room.status}"]`);
+        if (statusRadio) statusRadio.checked = true;
         if (room.image) {
             tempImageBase64 = room.image;
             uploadPreview.src = room.image;
@@ -483,7 +485,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial load
     fetchRooms();
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
 // Logout logic
 document.querySelectorAll('.logout-btn').forEach(btn => {

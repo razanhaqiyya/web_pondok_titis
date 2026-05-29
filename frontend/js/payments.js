@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+const init = () => {
 
     const API_URL = 'https://web-pondok-titis.onrender.com/api';
     let paymentsDatabase = [];
@@ -350,11 +350,16 @@ document.addEventListener('DOMContentLoaded', () => {
         currentDate.innerText = new Date().toLocaleDateString('id-ID', options);
     }
 
-    // ==========================================
     // INITIAL LOAD
     // ==========================================
     renderPayments();
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
 // ==========================================
 // RECEIPT PRINT FUNCTION (ADMIN PANEL)

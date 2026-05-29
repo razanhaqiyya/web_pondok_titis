@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+const init = () => {
 
     const API_URL = 'https://web-pondok-titis.onrender.com/api';
     let tenantsDatabase = [];
@@ -282,11 +282,16 @@ document.addEventListener('DOMContentLoaded', () => {
         currentDate.innerText = new Date().toLocaleDateString('id-ID', options);
     }
 
-    // ==========================================
     // INITIAL LOAD
     // ==========================================
     fetchTenants();
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
 // Logout logic
 document.querySelectorAll('.logout-btn').forEach(btn => {
