@@ -366,9 +366,11 @@ if (document.readyState === 'loading') {
 // RECEIPT PRINT FUNCTION (ADMIN PANEL)
 // ==========================================
 window.printReceipt = function(invoiceId) {
-    const history = JSON.parse(localStorage.getItem('pt_payments_data')) || [];
-    const item = history.find(h => h.id === invoiceId);
-    if (!item) return;
+    const item = paymentsDatabase.find(h => h.id === invoiceId);
+    if (!item) {
+        alert("Data pembayaran tidak ditemukan!");
+        return;
+    }
 
     const roomTypeLabel = item.room.type === 'standar' ? 'Standard' : (item.room.type === 'deluxe' ? 'Deluxe' : 'VIP');
     const locLabel = item.room.location === 'bandung' ? 'Bandung' : 'Solo';
