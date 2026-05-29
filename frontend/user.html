@@ -4196,7 +4196,7 @@
         };
 
         // Handle Remaining Action Button Click
-        document.getElementById('btnRemainingAction')?.addEventListener('click', () => {
+        document.getElementById('btnRemainingAction')?.addEventListener('click', async () => {
             if (!window.selectedRemainingPaymentRoomId) return;
 
             const lang = window.currentLang || 'id';
@@ -4206,31 +4206,24 @@
             const room = rooms.find(r => r.id === window.selectedRemainingPaymentRoomId);
             if (!room) return;
 
-            if (window.selectedRemainingPaymentType === 'cash') {
-                // Submit to pt_payments_data
-                let pending = JSON.parse(localStorage.getItem('pt_payments_data')) || [];
+            const btn = document.getElementById('btnRemainingAction');
+            const originalText = btn.innerText;
+            btn.innerText = 'Mengirim...';
+            btn.disabled = true;
 
-                const newRemainingPayment = {
-                    id: Date.now(),
-                    invoice: "INV-" + Date.now(),
-                    room: room,
-                    userEmail: currentUser.email,
-                    fullname: currentUser.fullname || currentUser.email.split('@')[0],
-                    email: currentUser.email,
-                    phone: currentUser.phone || '',
-                    emergencyPhone: currentUser.emergencyPhone || '',
-                    origin: currentUser.city || '',
-                    job: currentUser.job || '',
-                    checkinDate: new Date().toISOString().split('T')[0], // today
-                    type: 'SISA_CASH',
-                    amount: window.remainingAmountToPay,
-                    isRemainingPayment: true,
-                    status: "Waiting",
-                    date: new Date().toLocaleDateString('id-ID')
-                };
+            try {
+                const res = await fetch('https://web-pondok-titis.onrender.com/api/payments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        room_id: room.id,
+                        amount: window.remainingAmountToPay,
+                        proof_image: window.selectedRemainingPaymentType === 'cash' ? 'cash_pending.jpg' : 'qris_pending.jpg'
+                    })
+                });
 
-                pending.push(newRemainingPayment);
-                localStorage.setItem('pt_payments_data', JSON.stringify(pending));
+                if (!res.ok) throw new Error('Gagal mengirim data pelunasan');
 
                 // Update myRoom status to prevent duplicates
                 let myRoom = JSON.parse(localStorage.getItem('myRoom'));
@@ -4239,64 +4232,25 @@
                     localStorage.setItem('myRoom', JSON.stringify(myRoom));
                 }
 
-                // Redirect directly to WhatsApp with prefilled message
-                const savedSettings = localStorage.getItem('pt_settings');
-                const settings = savedSettings ? JSON.parse(savedSettings) : null;
-                const phoneAdmin = (settings && settings[room.location]?.phone) ? settings[room.location].phone : "6285128067691";
-                const message = `Halo Admin Pondok Titis, saya ingin melunasi sisa pembayaran secara Cash sebesar Rp ${window.remainingAmountToPay.toLocaleString()} untuk Kamar ${room.name} #${room.id}. Email Akun: ${currentUser.email}. Nama: ${currentUser.fullname || ''}. Mohon persetujuannya di sistem.`;
-                window.open(`https://wa.me/${phoneAdmin}?text=${encodeURIComponent(message)}`, '_blank');
-
-                closeModal('remainingPaymentModal');
-
-                const sentMsg = t ? t.toastRemainingSent : '✓ Konfirmasi pelunasan dikirim! Menunggu persetujuan admin.';
-                showToast(sentMsg);
-
-
-
-                // Refresh open My Room Modal
-                openMyRoomModal();
-            } else {
-                // QRIS option: submit to pt_payments_data
-                let pending = JSON.parse(localStorage.getItem('pt_payments_data')) || [];
-
-                const newRemainingPayment = {
-                    id: Date.now(),
-                    invoice: "INV-" + Date.now(),
-                    room: room,
-                    userEmail: currentUser.email,
-                    fullname: currentUser.fullname || currentUser.email.split('@')[0],
-                    email: currentUser.email,
-                    phone: currentUser.phone || '',
-                    emergencyPhone: currentUser.emergencyPhone || '',
-                    origin: currentUser.city || '',
-                    job: currentUser.job || '',
-                    checkinDate: new Date().toISOString().split('T')[0], // today
-                    type: 'SISA_QRIS',
-                    amount: window.remainingAmountToPay,
-                    isRemainingPayment: true,
-                    status: "Waiting",
-                    date: new Date().toLocaleDateString('id-ID')
-                };
-
-                pending.push(newRemainingPayment);
-                localStorage.setItem('pt_payments_data', JSON.stringify(pending));
-
-                // Update myRoom status to prevent duplicates
-                let myRoom = JSON.parse(localStorage.getItem('myRoom'));
-                if (myRoom && myRoom.tenantEmail === currentUser.email) {
-                    myRoom.paymentStatus = 'dp_pending_approval';
-                    localStorage.setItem('myRoom', JSON.stringify(myRoom));
+                if (window.selectedRemainingPaymentType === 'cash') {
+                    // Redirect directly to WhatsApp with prefilled message
+                    const savedSettings = localStorage.getItem('pt_settings');
+                    const settings = savedSettings ? JSON.parse(savedSettings) : null;
+                    const phoneAdmin = (settings && settings[room.location]?.phone) ? settings[room.location].phone : "6285128067691";
+                    const message = `Halo Admin Pondok Titis, saya ingin melunasi sisa pembayaran secara Cash sebesar Rp ${window.remainingAmountToPay.toLocaleString()} untuk Kamar ${room.name} #${room.number || room.id}. Email Akun: ${currentUser.email}. Nama: ${currentUser.fullname || ''}. Mohon persetujuannya di sistem.`;
+                    window.open(`https://wa.me/${phoneAdmin}?text=${encodeURIComponent(message)}`, '_blank');
                 }
 
                 closeModal('remainingPaymentModal');
-
                 const sentMsg = t ? t.toastRemainingSent : '✓ Konfirmasi pelunasan dikirim! Menunggu persetujuan admin.';
                 showToast(sentMsg);
-
-
-
-                // Refresh open My Room Modal
                 openMyRoomModal();
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan saat mengirim pelunasan. Silakan coba lagi.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
         });
 
@@ -4433,46 +4387,42 @@
             openModal('paymentModal');
         });
 
-        // Handle Telah Bayar (Simulated client notification)
-        document.getElementById('btnConfirmPayment')?.addEventListener('click', () => {
+        // Handle Telah Bayar (API Sync)
+        document.getElementById('btnConfirmPayment')?.addEventListener('click', async () => {
             if (!selectedBookingRoom || !currentBookingData) return;
+            
+            const btn = document.getElementById('btnConfirmPayment');
+            const originalText = btn.innerText;
+            btn.innerText = 'Mengirim...';
+            btn.disabled = true;
 
-            let pending = JSON.parse(localStorage.getItem('pt_payments_data')) || [];
+            try {
+                const res = await fetch('https://web-pondok-titis.onrender.com/api/payments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        room_id: selectedBookingRoom.id,
+                        amount: currentBookingData.amount,
+                        proof_image: 'pending_upload.jpg'
+                    })
+                });
 
-            const newBooking = {
-                id: Date.now(),
-                invoice: "INV-" + Date.now(),
-                room: {
-                    id: selectedBookingRoom.id,
-                    number: selectedBookingRoom.id.toString(),
-                    type: selectedBookingRoom.type,
-                    location: selectedBookingRoom.location || window.currentLocation || 'bandung',
-                    floor: selectedBookingRoom.floor || 1
-                },
-                userEmail: currentUser.email,
-                fullname: currentBookingData.fullname,
-                email: currentBookingData.email,
-                phone: currentBookingData.phone,
-                emergencyPhone: currentBookingData.emergencyPhone,
-                origin: currentBookingData.origin,
-                job: currentBookingData.job,
-                checkinDate: currentBookingData.checkinDate,
-                type: selectedPaymentType.toUpperCase(),
-                amount: currentBookingData.amount,
-                status: "Waiting",
-                date: new Date().toLocaleDateString('id-ID')
-            };
+                if (!res.ok) throw new Error('Gagal mengirim data pembayaran');
 
-            pending.push(newBooking);
-            localStorage.setItem('pt_payments_data', JSON.stringify(pending));
-
-            closeModal('paymentModal');
-            showToast('✓ Konfirmasi dikirim! Menunggu persetujuan admin.');
-
-            // Clean up
-            selectedBookingRoom = null;
-            currentBookingData = null;
-
+                closeModal('paymentModal');
+                showToast('✓ Konfirmasi dikirim! Menunggu persetujuan admin.');
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan saat mengirim pembayaran. Silakan coba lagi.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                
+                // Clean up
+                selectedBookingRoom = null;
+                currentBookingData = null;
+            }
 
         });
 
@@ -4621,17 +4571,38 @@
             openHistoryModal();
         });
 
-        function openHistoryModal() {
+        async function openHistoryModal() {
             const lang = window.currentLang || 'id';
             const t = (typeof window.translations !== 'undefined' && window.translations[lang]) ? window.translations[lang] : null;
             const container = document.getElementById('paymentHistoryContainer');
-            const history = JSON.parse(localStorage.getItem('pt_payments_data')) || [];
+            
+            // Show loading state
+            container.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-muted); font-weight: 600;">Memuat riwayat pembayaran...</div>`;
+            openModal('paymentHistoryModal');
 
-            // Filter by currentUser email (case-insensitive & trimmed)
-            const myHistory = history.filter(h =>
-                (h.userEmail && h.userEmail.trim().toLowerCase() === (currentUser.email || '').trim().toLowerCase()) ||
-                (h.email && h.email.trim().toLowerCase() === (currentUser.email || '').trim().toLowerCase())
-            );
+            let myHistory = [];
+            try {
+                const res = await fetch('https://web-pondok-titis.onrender.com/api/payments');
+                if (res.ok) {
+                    const allPayments = await res.json();
+                    myHistory = allPayments.filter(p => p.user_id === currentUser.id).map(p => ({
+                        id: p.id,
+                        invNumber: `INV-${p.id}`,
+                        date: new Date(p.created_at).toLocaleDateString('id-ID'),
+                        amount: p.amount,
+                        status: p.status === 'approved' ? 'Confirmed' : (p.status === 'rejected' ? 'Rejected' : 'Waiting'),
+                        room: p.rooms ? {
+                            id: p.rooms.id,
+                            number: p.rooms.room_number,
+                            type: p.rooms.type || 'standar',
+                            location: p.rooms.location || 'bandung',
+                            floor: p.rooms.floor || 1
+                        } : { number: '-', type: 'standar', location: 'bandung', floor: 1 }
+                    }));
+                }
+            } catch (err) {
+                console.error("Gagal memuat riwayat pembayaran dari API", err);
+            }
 
             if (myHistory.length === 0) {
                 const emptyMsg = t ? t.historyEmpty : "🔍 Belum ada riwayat transaksi pembayaran.";
