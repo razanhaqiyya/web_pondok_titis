@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderPayments();
         } catch (err) {
             console.error(err);
-            paymentsTableBody.innerHTML = `<tr><td colspan="7" class="empty-state">Gagal mengambil data dari server.</td></tr>`;
+            paymentsTableBody.innerHTML = `<tr><td colspan="7" class="empty-state">No data / Tidak ada transaksi sewa.</td></tr>`;
         }
     };
 

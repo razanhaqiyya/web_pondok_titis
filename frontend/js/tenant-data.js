@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderTenants();
         } catch(err) {
             console.error(err);
-            tenantTableBody.innerHTML = `<tr><td colspan="8" class="empty-state">Gagal mengambil data dari server.</td></tr>`;
+            tenantTableBody.innerHTML = `<tr><td colspan="8" class="empty-state">No data / Tidak ada transaksi sewa.</td></tr>`;
         }
     };
 
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (displayList.length === 0) {
             tenantTableBody.innerHTML = `
                 <tr>
-                    <td colspan="8" class="empty-state">Penyewa tidak ditemukan.</td>
+                    <td colspan="8" class="empty-state">No data / Tidak ada transaksi sewa.</td>
                 </tr>
             `;
             return;
