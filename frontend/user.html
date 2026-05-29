@@ -5012,10 +5012,10 @@
         function toggleWatchlistImpl(roomId, event) {
             if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
 
-            roomId = Number(roomId);
+            roomId = String(roomId);
             let watchlist = [];
             try {
-                watchlist = (JSON.parse(localStorage.getItem('watchlist')) || []).map(Number).filter(id => !isNaN(id));
+                watchlist = (JSON.parse(localStorage.getItem('watchlist')) || []).map(String);
             } catch (e) {
                 watchlist = [];
             }
@@ -5099,8 +5099,8 @@
                             </div>
                         </div>
                         <div style="display: flex; gap: 8px;">
-                            <button class="btn-action-sm btn-approve" onclick="closeModal('watchlistModal'); showRoomDetail(${room.id})" style="padding: 6px 12px; font-size: 0.75rem;">${viewBtnText}</button>
-                            <button class="btn-action-sm btn-reject" onclick="window.toggleWatchlist(${room.id}, event)" style="padding: 6px 12px; font-size: 0.75rem; border: none; margin-left: 0;">${deleteBtnText}</button>
+                            <button class="btn-action-sm btn-approve" onclick="closeModal('watchlistModal'); showRoomDetail('${room.id}')" style="padding: 6px 12px; font-size: 0.75rem;">${viewBtnText}</button>
+                            <button class="btn-action-sm btn-reject" onclick="window.toggleWatchlist('${room.id}', event)" style="padding: 6px 12px; font-size: 0.75rem; border: none; margin-left: 0;">${deleteBtnText}</button>
                         </div>
                     </div>
                 `;
