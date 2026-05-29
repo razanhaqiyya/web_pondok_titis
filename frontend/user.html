@@ -5062,13 +5062,13 @@
             const container = document.getElementById('watchlistContainer');
             let watchlist = [];
             try {
-                watchlist = (JSON.parse(localStorage.getItem('watchlist')) || []).map(Number).filter(id => !isNaN(id));
+                watchlist = (JSON.parse(localStorage.getItem('watchlist')) || []).map(String);
             } catch (e) {
                 watchlist = [];
             }
             const rooms = [...roomsData.bandung, ...roomsData.solo];
 
-            const savedRooms = rooms.filter(r => watchlist.includes(Number(r.id)));
+            const savedRooms = rooms.filter(r => watchlist.includes(String(r.id)));
 
             if (savedRooms.length === 0) {
                 const emptyMsg = t ? t.watchlistEmpty : "Watchlist Anda kosong. Cari kamar dan tambahkan ke favorit!";
