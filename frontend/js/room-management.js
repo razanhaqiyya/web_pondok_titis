@@ -343,7 +343,7 @@ const init = () => {
     };
 
     const openEditModal = (id) => {
-        const room = [...roomsDatabase.bandung, ...roomsDatabase.solo].find(r => r.id === id);
+        const room = [...roomsDatabase.bandung, ...roomsDatabase.solo].find(r => String(r.id) === String(id));
         if (!room) return;
         modalTitle.innerText = `Edit Kamar - ${room.number}`;
         editRoomId.value = room.id;
@@ -458,7 +458,7 @@ const init = () => {
     };
 
     window.toggleRoomMaint = async function(id) {
-        const room = [...roomsDatabase.bandung, ...roomsDatabase.solo].find(r => r.id === id);
+        const room = [...roomsDatabase.bandung, ...roomsDatabase.solo].find(r => String(r.id) === String(id));
         if (!room) return;
         const newStatus = room.status === 'Sedang Perbaikan' ? 'Tersedia' : 'Sedang Perbaikan';
         try {
@@ -472,7 +472,7 @@ const init = () => {
     };
 
     window.deleteRoom = async function(id) {
-        const room = [...roomsDatabase.bandung, ...roomsDatabase.solo].find(r => r.id === id);
+        const room = [...roomsDatabase.bandung, ...roomsDatabase.solo].find(r => String(r.id) === String(id));
         if (!room) return;
         if (confirm(`Hapus kamar "${room.number}"? Tindakan ini tidak bisa dibatalkan.`)) {
             try {
