@@ -4295,7 +4295,7 @@
                 vip: t ? t.detailTypeVIP : "Kamar VIP"
             };
             const locLabel = room.location === 'bandung' ? 'Bandung' : 'Solo';
-            document.getElementById('bookingRoomNameText').innerText = `${typeLabels[room.type]} (${locLabel} #${room.id})`;
+            document.getElementById('bookingRoomNameText').innerText = `${typeLabels[room.type]} (${locLabel} #${room.number || room.id})`;
             document.getElementById('bookingCashPriceVal').innerText = `Rp ${room.price.toLocaleString()}`;
 
             // Autofill user details
@@ -4585,7 +4585,7 @@
                 const res = await fetch('https://web-pondok-titis.onrender.com/api/payments');
                 if (res.ok) {
                     const allPayments = await res.json();
-                    myHistory = allPayments.filter(p => p.user_id === currentUser.id).map(p => ({
+                    myHistory = allPayments.filter(p => (p.users && p.users.id === currentUser.id) || p.user_id === currentUser.id).map(p => ({
                         id: p.id,
                         invNumber: `INV-${p.id}`,
                         date: new Date(p.created_at).toLocaleDateString('id-ID'),
