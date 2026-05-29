@@ -162,7 +162,7 @@ app.get('/api/payments', async (req, res) => {
         .select(`
             id, amount, status, proof_image, created_at,
             users ( id, name, email ),
-            rooms ( id, room_number )
+            rooms ( id, room_number, type, location, floor )
         `);
     if (error) return res.status(400).json({ error: error.message });
     res.json(data);
