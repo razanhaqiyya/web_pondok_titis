@@ -3860,7 +3860,7 @@
 
             let watchlist = [];
             try {
-                watchlist = (JSON.parse(localStorage.getItem('watchlist')) || []).map(Number).filter(id => !isNaN(id));
+                watchlist = (JSON.parse(localStorage.getItem('watchlist')) || []).map(String);
             } catch (e) {
                 watchlist = [];
             }
@@ -3892,7 +3892,7 @@
             const yearLabel = t ? t.roomPriceYear : '/tahun';
             const detailBtnLabel = t ? t.roomDetailBtn : 'Detail';
             grid.innerHTML = filtered.map(room => {
-                const isInWatchlist = watchlist.includes(Number(room.id));
+                const isInWatchlist = watchlist.includes(String(room.id));
                 return `
                 <div class="room-card">
                     <div class="room-card-img-container">
@@ -4963,7 +4963,7 @@
                 
                 data.forEach(r => {
                     const room = {
-                        id: Number(r.id),
+                        id: r.id,
                         name: r.name || 'Kamar',
                         number: r.room_number || '',
                         type: r.type || 'standar',
