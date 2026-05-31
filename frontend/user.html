@@ -4001,24 +4001,62 @@
                 navAvatar.style.background = 'transparent';
             }
 
-            // CHECK REJECTION NOTIFICATION BANNER
-            let rejections = JSON.parse(localStorage.getItem('pt_rejection_notifications')) || {};
-            let userRejection = (isLoggedIn && currentUser) ? rejections[currentUser.email] : null;
+            // CHECK REJECTION NOTIFICATION BANNER (API driven)
             let banner = document.getElementById('rejectionBanner');
-
-            if (userRejection) {
-                if (!banner) {
-                    banner = document.createElement('div');
-                    banner.id = 'rejectionBanner';
-                    banner.style.cssText = 'background: #fee2e2; color: #991b1b; padding: 12px 24px; text-align: center; font-weight: 600; font-size: 13px; border-bottom: 1px solid #fca5a5; position: fixed; top: 0; left: 0; right: 0; z-index: 999999; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-family: sans-serif;';
-                    banner.innerHTML = `
-                        <span>⚠️ Pemesanan sewa kamar Anda (${userRejection.roomNumber}) ditolak oleh Admin. Silakan hubungi kami via WhatsApp untuk detail selengkapnya.</span>
-                        <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Pondok%20Titis%2C%20saya%20ingin%20menanyakan%20status%20pemesanan%20kamar%20saya%20dengan%20No.%20Invoice%20${userRejection.invoice}" target="_blank" style="background: #ef4444; color: white; padding: 4px 12px; border-radius: 20px; text-decoration: none; font-size: 11px; font-weight: 700; transition: background 0.2s;">Hubungi Admin via WA</a>
-                        <button onclick="document.getElementById('rejectionBanner').remove(); document.body.style.paddingTop='0px';" style="background: none; border: none; font-size: 16px; color: #991b1b; cursor: pointer; font-weight: bold; margin-left: 10px;">&times;</button>
-                    `;
-                    document.body.appendChild(banner);
-                    document.body.style.paddingTop = '45px';
-                }
+            if (isLoggedIn && currentUser) {
+                (async () => {
+                    try {
+                        const res = await fetch('https://web-pondok-titis.onrender.com/api/payments');
+                        if (res.ok) {
+                            const payments = await res.json();
+                            const rejectedPayment = payments.find(p => 
+                                (p.user_id === currentUser.id || (p.users && p.users.id === currentUser.id)) && 
+                                p.status === 'rejected'
+                            );
+                            if (rejectedPayment) {
+                                const invoiceId = `INV-${rejectedPayment.id}`;
+                                const isDismissed = localStorage.getItem(`dismissed_rejection_${invoiceId}`) === 'true';
+                                
+                                if (!isDismissed) {
+                                    const roomNo = rejectedPayment.rooms ? (rejectedPayment.rooms.room_number || 'Kamar') : 'Kamar';
+                                    
+                                    // Get WA number dynamically from settings
+                                    const savedSettings = localStorage.getItem('pt_settings');
+                                    const settings = savedSettings ? JSON.parse(savedSettings) : null;
+                                    const branch = rejectedPayment.rooms ? rejectedPayment.rooms.location : 'bandung';
+                                    const phoneAdmin = (settings && settings[branch]?.phone) ? settings[branch].phone : "6285128067691";
+                                    
+                                    if (!banner) {
+                                        banner = document.createElement('div');
+                                        banner.id = 'rejectionBanner';
+                                        banner.style.cssText = 'background: #fee2e2; color: #991b1b; padding: 12px 24px; text-align: center; font-weight: 600; font-size: 13px; border-bottom: 1px solid #fca5a5; position: fixed; top: 0; left: 0; right: 0; z-index: 999999; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-family: sans-serif;';
+                                        banner.innerHTML = `
+                                            <span>⚠️ Pemesanan sewa kamar Anda (${roomNo}) ditolak oleh Admin. Silakan hubungi kami via WhatsApp untuk detail selengkapnya.</span>
+                                            <a href="https://wa.me/${phoneAdmin}?text=Halo%20Admin%20Pondok%20Titis%2C%20saya%20ingin%20menanyakan%20status%20pemesanan%20kamar%20saya%20dengan%20No.%20Invoice%20${invoiceId}" target="_blank" style="background: #ef4444; color: white; padding: 4px 12px; border-radius: 20px; text-decoration: none; font-size: 11px; font-weight: 700; transition: background 0.2s;">Hubungi Admin via WA</a>
+                                            <button id="dismissRejectionBtn" style="background: none; border: none; font-size: 16px; color: #991b1b; cursor: pointer; font-weight: bold; margin-left: 10px;">&times;</button>
+                                        `;
+                                        document.body.appendChild(banner);
+                                        document.body.style.paddingTop = '45px';
+                                        
+                                        document.getElementById('dismissRejectionBtn').addEventListener('click', () => {
+                                            localStorage.setItem(`dismissed_rejection_${invoiceId}`, 'true');
+                                            document.getElementById('rejectionBanner').remove();
+                                            document.body.style.paddingTop = '0px';
+                                        });
+                                    }
+                                    return; // Keep banner showing
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Gagal memeriksa notifikasi penolakan dari API:", e);
+                    }
+                    // If no active rejection or already dismissed
+                    if (banner) {
+                        banner.remove();
+                        document.body.style.paddingTop = '0px';
+                    }
+                })();
             } else {
                 if (banner) {
                     banner.remove();
@@ -4512,11 +4550,18 @@
                 const res = await fetch('https://web-pondok-titis.onrender.com/api/payments');
                 if (res.ok) {
                     const allPayments = await res.json();
+                    window.myPaymentsData = allPayments;
                     const approvedPayment = allPayments.find(p => 
                         (p.user_id === currentUser.id || (p.users && p.users.id === currentUser.id)) && 
                         p.status === 'approved'
                     );
                     if (approvedPayment && approvedPayment.rooms) {
+                        const hasPendingRemaining = allPayments.some(p => 
+                            (p.user_id === currentUser.id || (p.users && p.users.id === currentUser.id)) && 
+                            p.status === 'pending' && 
+                            p.room_id === approvedPayment.rooms.id
+                        );
+                        
                         myRoom = {
                             id: approvedPayment.rooms.id,
                             number: approvedPayment.rooms.room_number,
@@ -4529,7 +4574,7 @@
                             status: "Aktif",
                             tenantEmail: currentUser.email,
                             fullname: currentUser.name,
-                            paymentStatus: approvedPayment.amount < 10000000 ? 'dp' : 'lunas',
+                            paymentStatus: hasPendingRemaining ? 'dp_pending_approval' : (approvedPayment.amount < 10000000 ? 'dp' : 'lunas'),
                             price: approvedPayment.amount,
                             image: approvedPayment.rooms.location === 'bandung' ? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80' : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80'
                         };
@@ -4606,9 +4651,12 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="vertical-align: middle;"><path fill="#ffffff" d="M22.26 3.35A1 1 0 0 0 21.5 3h-9a1 1 0 0 0-.75.34a1 1 0 0 0-.24.79l1 7.5a1 1 0 1 0 2-.26l-.81-6.09a.22.22 0 0 1 .06-.19a.25.25 0 0 1 .17-.09H20a.22.22 0 0 1 .19.09a.24.24 0 0 1 .06.2l-1.09 6.57a1 1 0 1 0 2.33l1.34-8a1 1 0 0 0-.24-.84"/><path fill="#ffffff" d="M19 14h-6a.23.23 0 0 1-.22-.14L11.82 12a.5.5 0 0 0-.39-.28a.51.51 0 0 0-.45.18L9.1 14.21a.9.9 0 0 1-.59.28h-1A.5.5 0 0 0 7 15v6a.48.48 0 0 0 .2.4c2.3 1.73 4.08 2.6 5.3 2.6h5.55A1.7 1.7 0 0 0 20 22.66a56 56 0 0 0 1-7.16c0-.75-.69-1.5-2-1.5m-14.17-.5H1.75a.25.25 0 0 0-.25.25v9a.25.25 0 0 0 .25.25h3.08a.6.6 0 0 0 .67-.59v-8.32a.6.6 0 0 0-.67-.59M15.5 9a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0M10 11a1 1 0 0 0 1-1.16L9.73 2.29a.28.28 0 0 1 0-.2A.25.25 0 0 1 10 2h8a1 1 0 0 0 0-2H8.5a1 1 0 0 0-1 1.16l1.5 9a1 1 0 0 0 1 .84"/></svg> ${t ? t.myRoomBtnSisa : "Lunasi Sisa Pembayaran"}
                                 </button>
                             ` : (() => {
-                            const bookings = JSON.parse(localStorage.getItem('pendingBookings')) || [];
-                            const myPendingSisa = bookings.find(b => b.userEmail === currentUser.email && b.isRemainingPayment);
-                            const isCash = myPendingSisa && myPendingSisa.paymentType === 'sisa_cash';
+                            const pendingSisa = window.myPaymentsData ? window.myPaymentsData.find(p => 
+                                (p.user_id === currentUser.id || (p.users && p.users.id === currentUser.id)) && 
+                                p.status === 'pending' && 
+                                p.room_id === myRoom.id
+                            ) : null;
+                            const isCash = pendingSisa && (pendingSisa.proof_image || '').includes('cash');
                             const titleText = t ? t.myRoomSisaStatusPending : "Pelunasan Sedang Ditinjau";
                             const descText = isCash ? (t ? t.myRoomSisaStatusPendingCashDesc : "Pembayaran pelunasan Cash Anda sedang menunggu persetujuan Admin.") : (t ? t.myRoomSisaStatusPendingDesc : "Pembayaran pelunasan QRIS Anda sedang menunggu persetujuan Admin.");
                             return `
@@ -5029,6 +5077,43 @@
             }
         });
 
+        const syncSettingsWithAPI = async () => {
+            try {
+                const res = await fetch('https://web-pondok-titis.onrender.com/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem('pt_settings', JSON.stringify(data));
+                }
+            } catch (err) {
+                console.error("Gagal menyinkronkan pengaturan dari server:", err);
+            }
+        };
+
+        const syncWatchlistWithAPI = async () => {
+            if (!currentUser) return;
+            try {
+                const res = await fetch(`https://web-pondok-titis.onrender.com/api/watchlist/${currentUser.id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    window.watchlistDb = data;
+                    const roomIds = data.map(item => String(item.rooms ? item.rooms.id : ''));
+                    localStorage.setItem('watchlist', JSON.stringify(roomIds));
+                    
+                    // Direct styling refresh for heart buttons in list
+                    roomIds.forEach(id => {
+                        const btn = document.getElementById(`heart-btn-${id}`);
+                        if (btn) {
+                            btn.classList.add('active');
+                            const path = btn.querySelector('path');
+                            if (path) path.setAttribute('fill', '#db2777');
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error("Gagal menyinkronkan watchlist dari server:", err);
+            }
+        };
+
         const syncRoomsWithAPI = async () => {
             try {
                 const res = await fetch('https://web-pondok-titis.onrender.com/api/rooms');
@@ -5067,6 +5152,24 @@
                 
                 // Re-render rooms on page
                 if (typeof renderRooms === 'function') renderRooms();
+                
+                // Sync heart icons after rooms are loaded and rendered
+                if (currentUser) {
+                    const saved = localStorage.getItem('watchlist');
+                    if (saved) {
+                        try {
+                            const roomIds = JSON.parse(saved);
+                            roomIds.forEach(id => {
+                                const btn = document.getElementById(`heart-btn-${id}`);
+                                if (btn) {
+                                    btn.classList.add('active');
+                                    const path = btn.querySelector('path');
+                                    if (path) path.setAttribute('fill', '#db2777');
+                                }
+                            });
+                        } catch (e) {}
+                    }
+                }
             } catch (err) {
                 console.error("Gagal menyinkronkan data kamar dari server:", err);
             }
@@ -5082,51 +5185,111 @@
                 localStorage.setItem('paymentHistory', JSON.stringify([]));
             }
             
-            // Sync rooms from live Supabase API
+            // Sync settings, rooms, and watchlist from live Supabase API
+            syncSettingsWithAPI();
             syncRoomsWithAPI();
+            if (currentUser) {
+                syncWatchlistWithAPI();
+            }
         };
         // ======================= WATCHLIST PREMIUM INTERACTIVE LOGIC =======================
-        function toggleWatchlistImpl(roomId, event) {
+        async function toggleWatchlistImpl(roomId, event) {
             if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
 
             roomId = String(roomId);
-            let watchlist = [];
-            try {
-                watchlist = (JSON.parse(localStorage.getItem('watchlist')) || []).map(String);
-            } catch (e) {
-                watchlist = [];
-            }
-
-            const index = watchlist.indexOf(roomId);
-
-            if (index > -1) {
-                // Remove from watchlist
-                watchlist.splice(index, 1);
-                showToast('✓ Dihapus dari watchlist');
-            } else {
-                // Add to watchlist
-                watchlist.push(roomId);
-                showToast('✓ Ditambahkan ke watchlist');
-            }
-
-            localStorage.setItem('watchlist', JSON.stringify(watchlist));
-
-            // Direct DOM manipulation for butter-smooth pulse transition
-            const btn = document.getElementById(`heart-btn-${roomId}`);
-            if (btn) {
-                const path = btn.querySelector('path');
-                if (index > -1) {
-                    btn.classList.remove('active');
-                    if (path) path.setAttribute('fill', 'none');
-                } else {
-                    btn.classList.add('active');
-                    if (path) path.setAttribute('fill', '#db2777');
+            
+            if (!currentUser) {
+                // Fallback to local storage if not logged in
+                let watchlist = [];
+                try {
+                    watchlist = (JSON.parse(localStorage.getItem('watchlist')) || []).map(String);
+                } catch (e) {
+                    watchlist = [];
                 }
+
+                const index = watchlist.indexOf(roomId);
+
+                if (index > -1) {
+                    watchlist.splice(index, 1);
+                    showToast('✓ Dihapus dari watchlist');
+                } else {
+                    watchlist.push(roomId);
+                    showToast('✓ Ditambahkan ke watchlist');
+                }
+
+                localStorage.setItem('watchlist', JSON.stringify(watchlist));
+
+                const btn = document.getElementById(`heart-btn-${roomId}`);
+                if (btn) {
+                    const path = btn.querySelector('path');
+                    if (index > -1) {
+                        btn.classList.remove('active');
+                        if (path) path.setAttribute('fill', 'none');
+                    } else {
+                        btn.classList.add('active');
+                        if (path) path.setAttribute('fill', '#db2777');
+                    }
+                }
+
+                if (document.getElementById('watchlistModal').classList.contains('active')) {
+                    renderWatchlistModalContent();
+                }
+                return;
             }
 
-            // If the watchlist modal is currently active/open, re-render it!
-            if (document.getElementById('watchlistModal').classList.contains('active')) {
-                renderWatchlistModalContent();
+            // Sync with backend API if logged in
+            try {
+                const existingItem = (window.watchlistDb || []).find(item => item.rooms && String(item.rooms.id) === roomId);
+                
+                if (existingItem) {
+                    const res = await fetch(`https://web-pondok-titis.onrender.com/api/watchlist/${existingItem.id}`, {
+                        method: 'DELETE'
+                    });
+                    if (res.ok) {
+                        showToast('✓ Dihapus dari watchlist');
+                    } else {
+                        throw new Error('Gagal menghapus dari server');
+                    }
+                } else {
+                    const res = await fetch(`https://web-pondok-titis.onrender.com/api/watchlist`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user_id: currentUser.id,
+                            room_id: roomId
+                        })
+                    });
+                    if (res.ok) {
+                        showToast('✓ Ditambahkan ke watchlist');
+                    } else {
+                        throw new Error('Gagal menyimpan ke server');
+                    }
+                }
+                
+                await syncWatchlistWithAPI();
+
+                // Direct UI updates
+                const saved = localStorage.getItem('watchlist');
+                const roomIds = saved ? JSON.parse(saved) : [];
+                const hasItem = roomIds.includes(roomId);
+                const btn = document.getElementById(`heart-btn-${roomId}`);
+                if (btn) {
+                    const path = btn.querySelector('path');
+                    if (!hasItem) {
+                        btn.classList.remove('active');
+                        if (path) path.setAttribute('fill', 'none');
+                    } else {
+                        btn.classList.add('active');
+                        if (path) path.setAttribute('fill', '#db2777');
+                    }
+                }
+
+                if (document.getElementById('watchlistModal').classList.contains('active')) {
+                    renderWatchlistModalContent();
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Gagal memproses watchlist');
             }
         }
 

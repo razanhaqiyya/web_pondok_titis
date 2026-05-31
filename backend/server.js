@@ -236,6 +236,66 @@ app.post('/api/reset-data', async (req, res) => {
     }
 });
 
+// --- SETTINGS ENDPOINTS ---
+const defaultSettings = {
+    bandung: {
+        name: "Pondok Titis Bandung",
+        phone: "6285128067691",
+        address: "Jl. Jayasari No. 34, Bojongsoang, Bandung",
+        mapsIframe: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d247.51933210456357!2d107.63509847442991!3d-6.972787051880548!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e9b23c875a71%3A0x620136e5d548749d!2sPondok%20Titis%20%26%20GG%20Jayasari!5e0!3m2!1sid!2sid!4v1779553864533!5m2!1sid!2sid",
+        mapsLink: "https://www.google.com/maps/place/Pondok+Titis+%26+GG+Jayasari/@-6.9727871,107.6350985,19z/"
+    },
+    solo: {
+        name: "Pondok Titis Solo",
+        phone: "628987654321",
+        address: "Ketinggilan, Jebres, Surakarta, Jawa Tengah",
+        mapsIframe: "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d63286.67148769744!2d110.8454407!3d-7.5294174!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a171bdccf99a5%3A0x305730521ef5cc80!2sPONDOK%20%22TITIS%22!5e0!3m2!1sid!2sid!4v1779553889627!5m2!1sid!2sid",
+        mapsLink: "https://www.google.com/maps/place/PONDOK+%22TITIS%22/@-7.5294174,110.8454407,17z/"
+    }
+};
+
+let inMemorySettings = { ...defaultSettings };
+
+app.get('/api/settings', async (req, res) => {
+    if (supabase) {
+        try {
+            const { data, error } = await supabase.from('settings').select('*');
+            if (!error && data && data.length > 0) {
+                const configRow = data.find(row => row.key === 'config');
+                if (configRow) {
+                    return res.json(configRow.value);
+                }
+            }
+        } catch (err) {
+            console.error("Supabase settings query error, falling back to in-memory:", err);
+        }
+    }
+    res.json(inMemorySettings);
+});
+
+app.post('/api/settings', async (req, res) => {
+    const newSettings = req.body;
+    inMemorySettings = newSettings;
+    
+    if (supabase) {
+        try {
+            const { data: existing } = await supabase.from('settings').select('*').eq('key', 'config');
+            let result;
+            if (existing && existing.length > 0) {
+                result = await supabase.from('settings').update({ value: newSettings }).eq('key', 'config').select();
+            } else {
+                result = await supabase.from('settings').insert([{ key: 'config', value: newSettings }]).select();
+            }
+            if (!result.error && result.data && result.data.length > 0) {
+                return res.json(result.data[0].value);
+            }
+        } catch (err) {
+            console.error("Failed to save settings to Supabase, saved to memory:", err);
+        }
+    }
+    res.json(inMemorySettings);
+});
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

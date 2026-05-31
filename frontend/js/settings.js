@@ -29,33 +29,48 @@ document.addEventListener('DOMContentLoaded', () => {
         return JSON.parse(saved);
     };
 
-    const currentSettings = getSettings();
-
     // ==========================================
     // POPULATE FORM FIELDS
     // ==========================================
-    const populateFields = () => {
+    const populateFields = (settings) => {
+        if (!settings) return;
         // Bandung fields
-        document.getElementById('setBdgName').value = currentSettings.bandung.name || "";
-        document.getElementById('setBdgPhone').value = currentSettings.bandung.phone || "";
-        document.getElementById('setBdgAddress').value = currentSettings.bandung.address || "";
-        document.getElementById('setBdgMapsIframe').value = currentSettings.bandung.mapsIframe || "";
-        document.getElementById('setBdgMapsLink').value = currentSettings.bandung.mapsLink || "";
+        document.getElementById('setBdgName').value = settings.bandung.name || "";
+        document.getElementById('setBdgPhone').value = settings.bandung.phone || "";
+        document.getElementById('setBdgAddress').value = settings.bandung.address || "";
+        document.getElementById('setBdgMapsIframe').value = settings.bandung.mapsIframe || "";
+        document.getElementById('setBdgMapsLink').value = settings.bandung.mapsLink || "";
 
         // Solo fields
-        document.getElementById('setSoloName').value = currentSettings.solo.name || "";
-        document.getElementById('setSoloPhone').value = currentSettings.solo.phone || "";
-        document.getElementById('setSoloAddress').value = currentSettings.solo.address || "";
-        document.getElementById('setSoloMapsIframe').value = currentSettings.solo.mapsIframe || "";
-        document.getElementById('setSoloMapsLink').value = currentSettings.solo.mapsLink || "";
+        document.getElementById('setSoloName').value = settings.solo.name || "";
+        document.getElementById('setSoloPhone').value = settings.solo.phone || "";
+        document.getElementById('setSoloAddress').value = settings.solo.address || "";
+        document.getElementById('setSoloMapsIframe').value = settings.solo.mapsIframe || "";
+        document.getElementById('setSoloMapsLink').value = settings.solo.mapsLink || "";
     };
 
-    populateFields();
+    const fetchSettings = async () => {
+        try {
+            const res = await fetch(`${API_URL}/settings`);
+            if (res.ok) {
+                const settings = await res.json();
+                populateFields(settings);
+                localStorage.setItem('pt_settings', JSON.stringify(settings));
+            } else {
+                populateFields(getSettings());
+            }
+        } catch (err) {
+            console.error("Gagal mengambil pengaturan dari server:", err);
+            populateFields(getSettings());
+        }
+    };
+
+    fetchSettings();
 
     // ==========================================
     // SAVE SETTINGS ACTION
     // ==========================================
-    document.getElementById('btnSaveAllSettings').addEventListener('click', () => {
+    document.getElementById('btnSaveAllSettings').addEventListener('click', async () => {
         const bdgPhone = document.getElementById('setBdgPhone').value.trim();
         const soloPhone = document.getElementById('setSoloPhone').value.trim();
 
@@ -82,9 +97,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        localStorage.setItem('pt_settings', JSON.stringify(newSettings));
-        alert('Pengaturan berhasil disimpan! Halaman penyewa kos akan terupdate dengan data yang baru secara dinamis.');
-        window.location.reload();
+        const btn = document.getElementById('btnSaveAllSettings');
+        const originalText = btn.innerText;
+        btn.innerText = 'Menyimpan...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_URL}/settings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newSettings)
+            });
+            if (res.ok) {
+                const savedData = await res.json();
+                localStorage.setItem('pt_settings', JSON.stringify(savedData));
+                alert('Pengaturan berhasil disimpan secara publik di server! Halaman penyewa kos akan terupdate secara dinamis.');
+                window.location.reload();
+            } else {
+                throw new Error('Failed to save settings on server');
+            }
+        } catch (err) {
+            console.error(err);
+            localStorage.setItem('pt_settings', JSON.stringify(newSettings));
+            alert('Gagal menyimpan ke server, pengaturan disimpan secara lokal di browser ini.');
+            window.location.reload();
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     });
 
     // ==========================================

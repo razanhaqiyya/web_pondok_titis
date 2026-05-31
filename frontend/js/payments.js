@@ -208,26 +208,6 @@ const init = () => {
                 });
                 if (!res.ok) throw new Error('Gagal menyetujui pembayaran');
                 
-                // Backward compatibility untuk Sinkronisasi User UI
-                const myRoomData = {
-                    id: tx.room ? tx.room.id : 0,
-                    name: `Kamar ${tx.room ? tx.room.type : ''} #${tx.room ? tx.room.number : ''}`,
-                    type: tx.room ? tx.room.type : '',
-                    floor: tx.room ? tx.room.floor : 1,
-                    location: tx.room ? tx.room.location : 'bandung',
-                    checkin: tx.date,
-                    checkout: "Tahun Depan",
-                    status: "Aktif",
-                    tenantEmail: tx.email,
-                    fullname: tx.fullname,
-                    paymentStatus: 'lunas'
-                };
-                localStorage.setItem('myRoom', JSON.stringify(myRoomData));
-                
-                let rejections = JSON.parse(localStorage.getItem('pt_rejection_notifications')) || {};
-                delete rejections[tx.email];
-                localStorage.setItem('pt_rejection_notifications', JSON.stringify(rejections));
-
                 alert(`Pembayaran sewa "${tx.fullname}" sukses disetujui!\nKamar "${roomNameStr}" sekarang berstatus "Terisi".`);
                 fetchPayments(); // Refresh dari server
             } catch (err) {
@@ -255,22 +235,6 @@ const init = () => {
                     body: JSON.stringify({ status: 'rejected' })
                 });
                 if (!res.ok) throw new Error('Gagal menolak pembayaran');
-
-                // Sinkronisasi lokal untuk notifikasi User UI
-                let rejections = JSON.parse(localStorage.getItem('pt_rejection_notifications')) || {};
-                rejections[tx.email] = {
-                    invoice: tx.invoice,
-                    roomNumber: tx.room ? tx.room.number : '-',
-                    amount: tx.amount,
-                    date: tx.date,
-                    timestamp: new Date().toISOString()
-                };
-                localStorage.setItem('pt_rejection_notifications', JSON.stringify(rejections));
-                
-                const myRoom = JSON.parse(localStorage.getItem('myRoom'));
-                if (myRoom && myRoom.tenantEmail === tx.email) {
-                    localStorage.removeItem('myRoom');
-                }
 
                 alert(`Transaksi sewa "${tx.fullname}" ditolak.\nPengguna akan melihat notifikasi di dasbor user.`);
                 fetchPayments(); // Refresh dari server
