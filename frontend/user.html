@@ -4706,7 +4706,7 @@
                 if (res.ok) {
                     const allPayments = await res.json();
                     window.myPaymentsData = allPayments;
-                    const approvedPayment = allPayments.find(p => 
+                    const approvedPayment = [...allPayments].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).find(p => 
                         (p.user_id === currentUser.id || (p.users && p.users.id === currentUser.id)) && 
                         p.status === 'approved' && 
                         p.rooms && p.rooms.user_id === currentUser.id

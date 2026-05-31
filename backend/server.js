@@ -177,7 +177,7 @@ app.get('/api/payments', async (req, res) => {
         .select(`
             id, amount, status, proof_image, created_at,
             users ( id, name, email ),
-            rooms ( id, room_number, type, location, floor )
+            rooms ( id, room_number, type, location, floor, user_id, image )
         `);
     if (error) return res.status(400).json({ error: error.message });
     res.json(data);
@@ -235,7 +235,7 @@ app.get('/api/payments/user/:id', async (req, res) => {
     const { id } = req.params;
     const { data, error } = await supabase
         .from('payments')
-        .select('*')
+        .select('*, rooms ( id, room_number, type, location, floor, user_id, image )')
         .eq('user_id', id);
     if (error) return res.status(400).json({ error: error.message });
     res.json(data);
