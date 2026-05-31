@@ -129,11 +129,8 @@ const init = () => {
                 <td>${t.checkOut}</td>
                 <td><span class="room-card-badge badge-tersedia" style="position: static; font-size: 9px; padding: 2px 6px;">${t.status}</span></td>
                 <td style="text-align: center;">
-                    <button class="btn-card-action btn-card-edit btn-view-tenant" data-id="${t.id}" style="position: static; display: inline-flex; width: auto; padding: 4px 8px; font-size: 11px; align-items: center; gap: 4px; margin-right: 4px;" title="Lihat Detail Penyewa">
+                    <button class="btn-card-action btn-card-edit btn-view-tenant" data-id="${t.id}" style="position: static; display: inline-flex; width: auto; padding: 4px 8px; font-size: 11px; align-items: center; gap: 4px;" title="Lihat Detail Penyewa">
                         Detail
-                    </button>
-                    <button class="btn-card-action btn-card-delete btn-evict-tenant" data-id="${t.id}" style="position: static; display: inline-flex; width: auto; padding: 4px 8px; font-size: 11px; align-items: center; gap: 4px;" title="Keluarkan / Hapus Penyewa">
-                        Hapus
                     </button>
                 </td>
             `;
@@ -145,13 +142,6 @@ const init = () => {
     };
 
     const attachTableListeners = () => {
-        // Evict/Delete listener
-        document.querySelectorAll('.btn-evict-tenant').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tenantId = btn.getAttribute('data-id');
-                evictTenant(tenantId);
-            });
-        });
 
         // View detail listener
         document.querySelectorAll('.btn-view-tenant').forEach(btn => {
@@ -228,41 +218,7 @@ const init = () => {
         });
     }
 
-    // ==========================================
-    // ACTION: DELETE / EVICT RENTER
-    // ==========================================
-    const evictTenant = async (id) => {
-        const tenant = tenantsDatabase.find(t => t.id === id);
-        if (!tenant) return;
 
-        const confirmation = confirm(`Apakah Anda yakin ingin menghapus penyewa "${tenant.fullname}" dari kamar "${tenant.room.number}"? Kamar ini akan dikosongkan kembali di sistem.`);
-        
-        if (confirmation) {
-            try {
-                // Remove user from room and expire their payments via new API
-                const res = await fetch(`${API_URL}/users/${tenant.id}/kick`, {
-                    method: 'POST'
-                });
-                
-                if (!res.ok) throw new Error('Gagal mengeluarkan penyewa');
-                
-                // Clear user profile from local storage fallback
-                try {
-                    let allMeta = JSON.parse(localStorage.getItem('allUsersMeta') || '{}');
-                    if (allMeta[tenant.email]) {
-                        delete allMeta[tenant.email];
-                        localStorage.setItem('allUsersMeta', JSON.stringify(allMeta));
-                    }
-                } catch(e) {}
-
-                alert(`Penyewa "${tenant.fullname}" berhasil dikeluarkan. Kamar "${tenant.room.number}" sekarang statusnya menjadi "Tersedia". Penyewa ini di-reset menjadi User Baru.`);
-                fetchTenants(); // Refresh data dari server
-            } catch (err) {
-                console.error(err);
-                alert('Terjadi kesalahan saat menghubungi server.');
-            }
-        }
-    };
 
     // ==========================================
     // EXPORT DATA TO CSV / EXCEL
