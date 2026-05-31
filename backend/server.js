@@ -250,11 +250,6 @@ app.post('/api/users/:id/kick', async (req, res) => {
         user_id: null, 
         status: 'Tersedia' 
     }).eq('user_id', id);
-    
-    // Ubah status payment aktif menjadi expired agar tidak terhitung lagi
-    await supabase.from('payments').update({
-        status: 'expired'
-    }).eq('user_id', id).eq('status', 'approved');
 
     res.json({ message: 'User kicked and rooms freed successfully' });
 });
