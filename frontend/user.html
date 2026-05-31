@@ -4117,10 +4117,10 @@
                             if (approved) {
                                 const payTime = new Date(approved.created_at).getTime();
                                 const now = Date.now();
-                                const diffMinutes = (now - payTime) / 60000;
+                                const diffSeconds = (now - payTime) / 1000;
                                 
-                                // Waktu habis > 3 menit = Auto Kick
-                                if (diffMinutes > 3) {
+                                // Waktu habis > 80 detik (1 menit 20 detik) = Auto Kick
+                                if (diffSeconds > 80) {
                                     clearInterval(window.leaseCheckInterval);
                                     await fetch(`https://web-pondok-titis.onrender.com/api/users/${currentUser.id}/kick`, { method: 'POST' });
                                     
@@ -4138,8 +4138,8 @@
                                     return;
                                 }
                                 
-                                // Warning Lonceng > 1 menit
-                                if (diffMinutes > 1) {
+                                // Warning Lonceng > 50 detik
+                                if (diffSeconds > 50) {
                                     window.leaseExpiringSoon = true;
                                     document.body.classList.add('lease-expiring');
                                 } else {
