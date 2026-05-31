@@ -2785,7 +2785,7 @@
         </div>
 
         <div class="room-grid" id="roomGrid"></div>
-        <div id="emptyState" style="display: none; text-align: center; padding: 60px;">🔍 Kamar tidak ditemukan</div>
+        <div id="emptyState" style="display: none; text-align: center; padding: 60px;">Kamar tidak ditemukan</div>
 
         <!-- Tentang Kami Section -->
         <div class="about-section">
@@ -3073,31 +3073,30 @@
                 </div>
             </div>
             
-            <div style="padding: 56px 32px 32px 32px; max-height: 70vh; overflow-y: auto;">
-                <h2 data-translate-key="profileTitle" style="font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 4px;">Profil Saya</h2>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Kelola informasi pribadi dan detail kontak Anda di sini.</p>
+            <div style="padding: 56px 32px 32px 32px; max-height: 70vh; overflo                <h2 data-translate-key="profileTitle" style="font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 4px;">Profil Saya</h2>
+                <p data-translate-key="profileSubtitle" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Kelola informasi pribadi dan detail kontak Anda di sini.</p>
                 
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     <div>
-                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Nama Lengkap</label>
+                        <label data-translate-key="profileFullNameLabel" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Nama Lengkap</label>
                         <input type="text" id="profileFullName" data-translate-key="profileFullNamePlaceholder" placeholder="Masukkan nama lengkap Anda" style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg-section); color: var(--text); font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s; outline: none;">
                     </div>
                     
                     <div>
-                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">No. Handphone</label>
+                        <label data-translate-key="profilePhoneLabel" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">No. Handphone</label>
                         <input type="tel" id="profilePhone" data-translate-key="profilePhonePlaceholder" placeholder="Contoh: 08123456789" style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg-section); color: var(--text); font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s; outline: none;">
                     </div>
-
+ 
                     <div>
-                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Pekerjaan / Instansi</label>
+                        <label data-translate-key="profileJobLabel" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Pekerjaan / Instansi</label>
                         <input type="text" id="profileJob" data-translate-key="profileJobPlaceholder" placeholder="Mahasiswa / Karyawan" style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg-section); color: var(--text); font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s; outline: none;">
                     </div>
-
+ 
                     <div>
-                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Asal Kota</label>
+                        <label data-translate-key="profileCityLabel" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Asal Kota</label>
                         <input type="text" id="profileCity" data-translate-key="profileCityPlaceholder" placeholder="Contoh: Jakarta" style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg-section); color: var(--text); font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s; outline: none;">
                     </div>
-                </div>
+                </div>        </div>
 
                 <div style="margin-top: 32px;">
                     <button class="button-primary" id="btnSaveProfile" data-translate-key="profileSaveBtn" style="width: 100%; padding: 16px; border-radius: 16px; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 15px rgba(219,39,119,0.3); letter-spacing: 0.5px; transition: transform 0.2s, box-shadow 0.2s;">
@@ -3934,6 +3933,7 @@
 
             if (filtered.length === 0) {
                 grid.innerHTML = '';
+                empty.innerText = window.currentLang === 'en' ? 'No rooms found' : 'Kamar tidak ditemukan';
                 empty.style.display = 'block';
                 return;
             }
@@ -4176,40 +4176,61 @@
             }
         });
 
-        document.getElementById('btnSaveProfile')?.addEventListener('click', () => {
+        document.getElementById('btnSaveProfile')?.addEventListener('click', async () => {
             if (currentUser) {
-                currentUser.fullname = document.getElementById('profileFullName').value;
-                currentUser.phone = document.getElementById('profilePhone').value;
-                currentUser.job = document.getElementById('profileJob').value;
-                currentUser.city = document.getElementById('profileCity').value;
-                window.currentUser = currentUser;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                let users = JSON.parse(localStorage.getItem('users')) || [];
-                const index = users.findIndex(u => u.email === currentUser.email);
-                if (index !== -1) users[index] = currentUser;
-                localStorage.setItem('users', JSON.stringify(users));
+                const fullname = document.getElementById('profileFullName').value.trim();
+                const phone = document.getElementById('profilePhone').value.trim();
+                const job = document.getElementById('profileJob').value.trim();
+                const city = document.getElementById('profileCity').value.trim();
+                const emergencyPhone = currentUser.emergencyPhone || '';
 
-                // Sync with admin's tenant data
-                let tenants = JSON.parse(localStorage.getItem('pt_tenants_data')) || [];
-                let tenantUpdated = false;
-                tenants = tenants.map(t => {
-                    if (t.email === currentUser.email) {
-                        t.fullname = currentUser.fullname;
-                        t.phone = currentUser.phone;
-                        t.emergencyPhone = currentUser.emergencyPhone;
-                        t.origin = currentUser.city;
-                        t.job = currentUser.job;
-                        tenantUpdated = true;
+                const btn = document.getElementById('btnSaveProfile');
+                const originalText = btn.innerText;
+                btn.innerText = window.currentLang === 'en' ? 'Saving...' : 'Menyimpan...';
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch(`https://web-pondok-titis.onrender.com/api/users/${currentUser.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: fullname,
+                            phone: phone,
+                            job: job,
+                            origin: city,
+                            emergency_phone: emergencyPhone
+                        })
+                    });
+                    if (res.ok) {
+                        const updatedUser = await res.json();
+                        currentUser.name = updatedUser.name;
+                        currentUser.fullname = updatedUser.name;
+                        currentUser.phone = updatedUser.phone;
+                        currentUser.job = updatedUser.job;
+                        currentUser.city = updatedUser.origin;
+                        currentUser.emergencyPhone = updatedUser.emergency_phone;
+                        window.currentUser = currentUser;
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        
+                        showToast(window.currentLang === 'en' ? '✓ Profile saved to database!' : '✓ Profil berhasil disimpan ke database!');
+                    } else {
+                        throw new Error('Failed to save to server');
                     }
-                    return t;
-                });
-                if (tenantUpdated) {
-                    localStorage.setItem('pt_tenants_data', JSON.stringify(tenants));
+                } catch (err) {
+                    console.error(err);
+                    currentUser.fullname = fullname;
+                    currentUser.phone = phone;
+                    currentUser.job = job;
+                    currentUser.city = city;
+                    window.currentUser = currentUser;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showToast('⚠️ Gagal menyimpan ke server, disimpan lokal.');
+                } finally {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    closeModal('profileModal');
+                    updateUI();
                 }
-
-                updateUI();
-                closeModal('profileModal');
-                alert('Profil berhasil disimpan!');
             }
         });
 
@@ -4494,10 +4515,33 @@
             
             const btn = document.getElementById('btnConfirmPayment');
             const originalText = btn.innerText;
-            btn.innerText = 'Mengirim...';
+            btn.innerText = window.currentLang === 'en' ? 'Sending...' : 'Mengirim...';
             btn.disabled = true;
 
             try {
+                // 1. Sync User Booking Details to Supabase Database
+                await fetch(`https://web-pondok-titis.onrender.com/api/users/${currentUser.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: currentBookingData.fullname,
+                        phone: currentBookingData.phone,
+                        emergency_phone: currentBookingData.emergencyPhone,
+                        origin: currentBookingData.origin,
+                        job: currentBookingData.job
+                    })
+                });
+
+                // Update local profile session
+                currentUser.fullname = currentBookingData.fullname;
+                currentUser.name = currentBookingData.fullname;
+                currentUser.phone = currentBookingData.phone;
+                currentUser.emergencyPhone = currentBookingData.emergencyPhone;
+                currentUser.city = currentBookingData.origin;
+                currentUser.job = currentBookingData.job;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                // 2. Submit payment to API
                 const res = await fetch('https://web-pondok-titis.onrender.com/api/payments', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -4523,8 +4567,8 @@
                 // Clean up
                 selectedBookingRoom = null;
                 currentBookingData = null;
+                updateUI();
             }
-
         });
 
 
@@ -4576,7 +4620,7 @@
                             fullname: currentUser.name,
                             paymentStatus: hasPendingRemaining ? 'dp_pending_approval' : (approvedPayment.amount < 10000000 ? 'dp' : 'lunas'),
                             price: approvedPayment.amount,
-                            image: approvedPayment.rooms.location === 'bandung' ? 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80' : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80'
+                            image: approvedPayment.rooms.image || (approvedPayment.rooms.type === 'vip' ? 'images/room_vip.png' : (approvedPayment.rooms.type === 'deluxe' ? 'images/room_deluxe.png' : 'images/room_standard.png'))
                         };
                     }
                 }
@@ -4722,7 +4766,8 @@
             const container = document.getElementById('paymentHistoryContainer');
             
             // Show loading state
-            container.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-muted); font-weight: 600;">Memuat riwayat pembayaran...</div>`;
+            const loadingMsg = lang === 'en' ? "Loading payment history..." : "Memuat riwayat pembayaran...";
+            container.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-muted); font-weight: 600;">${loadingMsg}</div>`;
             openModal('paymentHistoryModal');
 
             let myHistory = [];
@@ -4793,6 +4838,7 @@
                     const btnPrintText = t ? t.historyBtnPrint : "Cetak Kuitansi";
                     const floorLabel = t ? t.roomFloor : "Lantai";
 
+                    const statusLabel = h.status === 'Waiting' ? (lang === 'en' ? 'Pending' : 'Menunggu') : ((h.status === 'Confirmed' || h.status === 'Approved') ? (lang === 'en' ? 'Approved' : 'Disetujui') : (lang === 'en' ? 'Rejected' : 'Ditolak'));
                     html += `
                         <tr>
                             <td>
@@ -4808,7 +4854,7 @@
                             <td>
                                 <div class="admin-tenant-info">
                                     <span style="font-weight: 750; color: var(--primary);">Rp ${h.amount.toLocaleString()}</span>
-                                    <span class="admin-badge ${h.status === 'Waiting' ? 'waiting' : ((h.status === 'Confirmed' || h.status === 'Approved') ? 'approved' : 'rejected')}" style="padding: 2px 6px; font-size: 0.65rem; margin-top: 4px; text-align: center; max-width: 60px; background: ${h.status === 'Waiting' ? '#fef3c7' : ((h.status === 'Confirmed' || h.status === 'Approved') ? '#dcfce7' : '#fee2e2')}; color: ${h.status === 'Waiting' ? '#d97706' : ((h.status === 'Confirmed' || h.status === 'Approved') ? '#15803d' : '#b91c1c')}; border-radius: 4px;">${h.status === 'Waiting' ? 'Menunggu' : ((h.status === 'Confirmed' || h.status === 'Approved') ? 'Disetujui' : 'Ditolak')}</span>
+                                    <span class="admin-badge ${h.status === 'Waiting' ? 'waiting' : ((h.status === 'Confirmed' || h.status === 'Approved') ? 'approved' : 'rejected')}" style="padding: 2px 6px; font-size: 0.65rem; margin-top: 4px; text-align: center; max-width: 60px; background: ${h.status === 'Waiting' ? '#fef3c7' : ((h.status === 'Confirmed' || h.status === 'Approved') ? '#dcfce7' : '#fee2e2')}; color: ${h.status === 'Waiting' ? '#d97706' : ((h.status === 'Confirmed' || h.status === 'Approved') ? '#15803d' : '#b91c1c')}; border-radius: 4px;">${statusLabel}</span>
                                 </div>
                             </td>
                             <td style="text-align: center;">

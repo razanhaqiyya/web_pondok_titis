@@ -109,11 +109,26 @@ app.get('/api/users', async (req, res) => {
     const { data, error } = await supabase
         .from('users')
         .select(`
-            id, name, email, role, created_at,
+            id, name, email, role, created_at, phone, emergency_phone, origin, job,
             rooms ( id, room_number, location, floor, type )
         `);
     if (error) return res.status(400).json({ error: error.message });
     res.json(data);
+});
+
+app.put('/api/users/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, phone, emergency_phone, origin, job } = req.body;
+    if (!supabase) return res.status(500).json({ error: 'Database not connected' });
+
+    const { data, error } = await supabase
+        .from('users')
+        .update({ name, phone, emergency_phone, origin, job })
+        .eq('id', id)
+        .select();
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.json(data[0]);
 });
 
 app.delete('/api/rooms/:id', async (req, res) => {
