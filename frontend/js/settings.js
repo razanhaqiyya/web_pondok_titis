@@ -90,51 +90,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // DANGER ZONE: RESET DATA ACTION
     // ==========================================
-    document.getElementById('btnResetData').addEventListener('click', () => {
+    document.getElementById('btnResetData').addEventListener('click', async () => {
         const confirm1 = confirm('PERINGATAN: Apakah Anda yakin ingin MERESET data demo Pondok Titis?\n\nTindakan ini akan menghapus seluruh data transaksi dari pengguna (Penyewa, Riwayat Pembayaran, & Kontrak Sewa aktif).');
         if (!confirm1) return;
 
         const confirm2 = confirm('VERIFIKASI AKHIR: Tindakan ini TIDAK dapat dibatalkan!\n\nSemua kamar yang terisi akan diatur kembali statusnya menjadi "Tersedia" (Kosong). Klik OK untuk melanjutkan reset penuh.');
         if (!confirm2) return;
-
-        // Perform clean wipe on transaction keys
-        localStorage.setItem('pt_tenants_data', JSON.stringify([]));
-        localStorage.setItem('pt_payments_data', JSON.stringify([]));
-        localStorage.removeItem('myRoom');
-        localStorage.removeItem('pt_rejection_notifications');
-        localStorage.removeItem('pendingBookings');
         
-        // Reset room statuses in pt_rooms_data
-        let roomsData = localStorage.getItem('pt_rooms_data');
-        if (roomsData) {
-            const db = JSON.parse(roomsData);
-            
-            // Set Bandung rooms back to "Tersedia" (except "Sedang Perbaikan" or others to look authentic)
-            if (db.bandung) {
-                db.bandung.forEach((r, idx) => {
-                    // Keep original repair rooms under repair for realness, set all others to Available
-                    if (r.status === "Sedang Perbaikan") {
-                        r.status = "Sedang Perbaikan";
-                    } else {
-                        r.status = "Tersedia";
-                    }
-                });
-            }
-            // Set Solo rooms back to "Tersedia"
-            if (db.solo) {
-                db.solo.forEach((r, idx) => {
-                    if (r.status === "Sedang Perbaikan") {
-                        r.status = "Sedang Perbaikan";
-                    } else {
-                        r.status = "Tersedia";
-                    }
-                });
-            }
-            localStorage.setItem('pt_rooms_data', JSON.stringify(db));
-        }
+        const btn = document.getElementById('btnResetData');
+        const originalText = btn.innerText;
+        btn.innerText = 'Mereset Data...';
+        btn.disabled = true;
 
-        alert('DEMO RESET BERHASIL!\n\nSemua data transaksi pengguna telah dibersihkan dan seluruh kamar telah dikosongkan. Sistem kini kembali bersih seperti baru.');
-        window.location.reload();
+        try {
+            const res = await fetch(`https://web-pondok-titis.onrender.com/api/reset-data`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!res.ok) throw new Error('Gagal mereset data di server');
+            
+            // Perform clean wipe on transaction keys in local storage as well for good measure
+            localStorage.setItem('pt_tenants_data', JSON.stringify([]));
+            localStorage.setItem('pt_payments_data', JSON.stringify([]));
+            localStorage.removeItem('myRoom');
+            localStorage.removeItem('pt_rejection_notifications');
+            localStorage.removeItem('pendingBookings');
+            localStorage.removeItem('pt_rooms_data'); // Force refresh from server next time
+
+            alert('DEMO RESET BERHASIL!\n\nSemua data transaksi pengguna telah dibersihkan dan seluruh kamar telah dikosongkan. Sistem kini kembali bersih seperti baru.');
+            window.location.reload();
+        } catch (err) {
+            console.error(err);
+            alert('Terjadi kesalahan saat mereset data ke server.');
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     });
 
     // Update current date top header

@@ -216,6 +216,26 @@ app.put('/api/rooms/:id/evict', async (req, res) => {
     res.json({ message: 'Tenant evicted successfully' });
 });
 
+// --- RESET DATA ENDPOINT (DANGER) ---
+app.post('/api/reset-data', async (req, res) => {
+    if (!supabase) return res.status(500).json({ error: 'Database not connected' });
+    
+    try {
+        // 1. Set all rooms to 'Tersedia' and remove user_id
+        await supabase.from('rooms').update({ user_id: null, status: 'Tersedia' }).neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        // 2. Clear all payments
+        await supabase.from('payments').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        // 3. Clear all watchlists
+        await supabase.from('watchlist').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        res.json({ message: 'Data reset successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
