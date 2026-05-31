@@ -4055,7 +4055,8 @@
                 closeModal('loginModal');
                 alert(`Selamat datang ${data.name || email}!`);
             } catch (err) {
-                alert('Gagal: ' + err.message);
+                console.error(err);
+                alert('Email atau kata sandi yang Anda masukkan salah. Silakan periksa kembali.');
             }
         });
 
