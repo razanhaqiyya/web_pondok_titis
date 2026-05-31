@@ -185,6 +185,14 @@ window.translations = {
         profileCityLabel: "Asal Kota",
         profileCityPlaceholder: "Asal Kota",
         profileSaveBtn: "Simpan Perubahan",
+        // Change Password Modal
+        cpTitle: "Ganti Password",
+        cpSubtitle: "Silakan masukkan password baru Anda. Setelah berhasil, Anda akan otomatis logout.",
+        cpNewPassLabel: "Password Baru",
+        cpNewPassPlaceholder: "Minimal 8 karakter",
+        cpConfirmPassLabel: "Konfirmasi Password",
+        cpConfirmPassPlaceholder: "Ketik ulang password baru",
+        cpSaveBtn: "Simpan Password Baru",
         // Watchlist Modal
         watchlistTitle: "Watchlist Saya",
         watchlistEmpty: "Watchlist Anda kosong. Cari kamar dan tambahkan ke favorit!",
@@ -246,6 +254,7 @@ window.translations = {
         myRoomCheckout: "Akhir Sewa (Check-out):",
         myRoomNoteTitle: "Catatan Pengambilan Kunci:",
         myRoomNoteDesc: "Silakan bawa KTP asli Anda beserta bukti kuitansi digital ke Pos Jaga / Security Pondok Titis untuk mengambil kunci kamar fisik Anda.",
+        myRoomNextYear: "Tahun Depan",
         // Payment History Modal
         historyTitle: "Riwayat Pembayaran Anda",
         historyDesc: "Berikut adalah daftar kuitansi dan riwayat transaksi pengajuan sewa Anda.",
@@ -466,8 +475,16 @@ window.translations = {
         profileJobLabel: "Occupation / Institution",
         profileJobPlaceholder: "Occupation",
         profileCityLabel: "Origin City",
-        profileCityPlaceholder: "Origin City",
+        profileCityPlaceholder: "Hometown",
         profileSaveBtn: "Save Changes",
+        // Change Password Modal
+        cpTitle: "Change Password",
+        cpSubtitle: "Please enter your new password. You will be automatically logged out after success.",
+        cpNewPassLabel: "New Password",
+        cpNewPassPlaceholder: "Min 8 characters",
+        cpConfirmPassLabel: "Confirm Password",
+        cpConfirmPassPlaceholder: "Retype new password",
+        cpSaveBtn: "Save New Password",
         // Watchlist Modal
         watchlistTitle: "My Watchlist",
         watchlistEmpty: "Your watchlist is empty. Find rooms and add them to favorites!",
@@ -528,7 +545,8 @@ window.translations = {
         myRoomCheckin: "Check-in:",
         myRoomCheckout: "End of Lease (Check-out):",
         myRoomNoteTitle: "Key Collection Note:",
-        myRoomNoteDesc: "Please bring your original ID Card (KTP) along with this digital receipt to the Pondok Titis Security Post to collect your physical room keys.",
+        myRoomNoteDesc: "Please bring your original ID and digital receipt to the Pondok Titis Security Post to collect your physical room key.",
+        myRoomNextYear: "Next Year",
         // Payment History Modal
         historyTitle: "Your Payment History",
         historyDesc: "Here is the list of your receipts and lease application transaction history.",

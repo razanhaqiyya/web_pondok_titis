@@ -15,14 +15,35 @@ const init = () => {
                 .filter(u => u.rooms && u.rooms.length > 0) // Hanya ambil yang punya kamar
                 .map(u => {
                     const r = u.rooms[0]; // Ambil kamar pertama
+                    
+                    // Fallback ke localStorage untuk simulasi jika kolom database belum dibuat
+                    let localPhone = u.phone;
+                    let localEmergency = u.emergency_phone;
+                    let localOrigin = u.origin;
+                    let localJob = u.job;
+
+                    try {
+                        const allUsersStr = localStorage.getItem('allUsersMeta');
+                        if (allUsersStr) {
+                            const allMeta = JSON.parse(allUsersStr);
+                            const userMeta = allMeta[u.email];
+                            if (userMeta) {
+                                if (!localPhone) localPhone = userMeta.phone;
+                                if (!localEmergency) localEmergency = userMeta.emergency_phone;
+                                if (!localOrigin) localOrigin = userMeta.origin;
+                                if (!localJob) localJob = userMeta.job;
+                            }
+                        }
+                    } catch(e) { console.warn("Fallback local storage gagal", e); }
+
                     return {
                         id: u.id,
                         fullname: u.name || 'User Tanpa Nama',
                         email: u.email,
-                        phone: u.phone || '-',
-                        emergencyPhone: u.emergency_phone || '-',
-                        origin: u.origin || '-',
-                        job: u.job || '-',
+                        phone: localPhone || '-',
+                        emergencyPhone: localEmergency || '-',
+                        origin: localOrigin || '-',
+                        job: localJob || '-',
                         checkIn: new Date(u.created_at).toLocaleDateString('id-ID'),
                         checkOut: 'Sedang Berjalan',
                         status: 'Aktif',

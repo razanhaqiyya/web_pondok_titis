@@ -3064,16 +3064,17 @@
     </div>
 
     <div class="modal-overlay" id="profileModal">
-        <div class="modal-content" style="max-width: 480px; padding: 0; overflow: hidden; background: var(--bg-card); border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.15);">
+        <div class="modal-content" style="max-width: 480px; padding: 0; overflow: hidden; background: var(--bg-card); border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column; max-height: 90vh;">
             <!-- Banner & Avatar -->
-            <div style="background: linear-gradient(135deg, #db2777, #f97316); height: 120px; position: relative;">
+            <div style="background: linear-gradient(135deg, #db2777, #f97316); height: 120px; min-height: 120px; position: relative; flex-shrink: 0;">
                 <button class="modal-close" onclick="closeModal('profileModal')" style="color: white; background: rgba(0,0,0,0.2); right: 16px; top: 16px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">×</button>
                 <div style="position: absolute; bottom: -40px; left: 32px; width: 80px; height: 80px; background: white; border-radius: 50%; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     <div id="profileAvatarInitial" style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800;">U</div>
                 </div>
             </div>
             
-            <div style="padding: 56px 32px 32px 32px; max-height: 70vh; overflo                <h2 data-translate-key="profileTitle" style="font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 4px;">Profil Saya</h2>
+            <div style="padding: 56px 32px 32px 32px; flex: 1; overflow-y: auto; max-height: none;">
+                <h2 data-translate-key="profileTitle" style="font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 4px;">Profil Saya</h2>
                 <p data-translate-key="profileSubtitle" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Kelola informasi pribadi dan detail kontak Anda di sini.</p>
                 
                 <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -3096,7 +3097,7 @@
                         <label data-translate-key="profileCityLabel" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Asal Kota</label>
                         <input type="text" id="profileCity" data-translate-key="profileCityPlaceholder" placeholder="Contoh: Jakarta" style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg-section); color: var(--text); font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s; outline: none;">
                     </div>
-                </div>        </div>
+                </div>
 
                 <div style="margin-top: 32px;">
                     <button class="button-primary" id="btnSaveProfile" data-translate-key="profileSaveBtn" style="width: 100%; padding: 16px; border-radius: 16px; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 15px rgba(219,39,119,0.3); letter-spacing: 0.5px; transition: transform 0.2s, box-shadow 0.2s;">
@@ -3111,22 +3112,22 @@
     <div class="modal-overlay" id="changePasswordModal">
         <div class="modal-content" style="max-width: 450px; padding: 32px; border-radius: 24px;">
             <button class="modal-close" onclick="closeModal('changePasswordModal')">×</button>
-            <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 8px;">Ganti Password</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Silakan masukkan password baru Anda. Setelah berhasil, Anda akan otomatis logout.</p>
+            <h2 data-translate-key="cpTitle" style="font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 8px;">Ganti Password</h2>
+            <p data-translate-key="cpSubtitle" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Silakan masukkan password baru Anda. Setelah berhasil, Anda akan otomatis logout.</p>
             
             <div style="display: flex; flex-direction: column; gap: 16px;">
                 <div>
-                    <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">Password Baru</label>
-                    <input type="password" id="cpNewPassword" placeholder="Minimal 8 karakter" style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg-section); color: var(--text); font-size: 0.95rem; outline: none;">
+                    <label data-translate-key="cpNewPassLabel" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">Password Baru</label>
+                    <input type="password" id="cpNewPassword" data-translate-key="cpNewPassPlaceholder" placeholder="Minimal 8 karakter" style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg-section); color: var(--text); font-size: 0.95rem; outline: none;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">Konfirmasi Password</label>
-                    <input type="password" id="cpConfirmPassword" placeholder="Ketik ulang password baru" style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg-section); color: var(--text); font-size: 0.95rem; outline: none;">
+                    <label data-translate-key="cpConfirmPassLabel" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">Konfirmasi Password</label>
+                    <input type="password" id="cpConfirmPassword" data-translate-key="cpConfirmPassPlaceholder" placeholder="Ketik ulang password baru" style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg-section); color: var(--text); font-size: 0.95rem; outline: none;">
                 </div>
             </div>
 
             <div style="margin-top: 32px;">
-                <button class="button-primary" id="btnSubmitChangePassword" style="width: 100%; padding: 16px; border-radius: 16px; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 15px rgba(219,39,119,0.3); transition: transform 0.2s;">
+                <button class="button-primary" id="btnSubmitChangePassword" data-translate-key="cpSaveBtn" style="width: 100%; padding: 16px; border-radius: 16px; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 15px rgba(219,39,119,0.3); transition: transform 0.2s;">
                     Simpan Password Baru
                 </button>
             </div>
@@ -4224,6 +4225,12 @@
                     currentUser.city = city;
                     window.currentUser = currentUser;
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    let allMeta = {};
+                    try { allMeta = JSON.parse(localStorage.getItem('allUsersMeta') || '{}'); } catch(e){}
+                    allMeta[currentUser.email] = { phone, job, origin: city, emergency_phone: emergencyPhone };
+                    localStorage.setItem('allUsersMeta', JSON.stringify(allMeta));
+                    
                     showToast('⚠️ Gagal menyimpan ke server, disimpan lokal.');
                 } finally {
                     btn.innerText = originalText;
@@ -4541,6 +4548,16 @@
                 currentUser.job = currentBookingData.job;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
+                let allMeta = {};
+                try { allMeta = JSON.parse(localStorage.getItem('allUsersMeta') || '{}'); } catch(e){}
+                allMeta[currentUser.email] = { 
+                    phone: currentBookingData.phone, 
+                    job: currentBookingData.job, 
+                    origin: currentBookingData.origin, 
+                    emergency_phone: currentBookingData.emergencyPhone 
+                };
+                localStorage.setItem('allUsersMeta', JSON.stringify(allMeta));
+
                 // 2. Submit payment to API
                 const res = await fetch('https://web-pondok-titis.onrender.com/api/payments', {
                     method: 'POST',
@@ -4614,7 +4631,7 @@
                             floor: approvedPayment.rooms.floor || 1,
                             location: approvedPayment.rooms.location || 'bandung',
                             checkin: new Date(approvedPayment.created_at).toLocaleDateString('id-ID'),
-                            checkout: "Tahun Depan",
+                            checkout: t ? t.myRoomNextYear : "Tahun Depan",
                             status: "Aktif",
                             tenantEmail: currentUser.email,
                             fullname: currentUser.name,
@@ -4727,7 +4744,7 @@
                                 </div>
                                 <div style="display: flex; justify-content: space-between;">
                                     <span style="color: var(--text-muted);">${floorLabel}</span>
-                                    <span>Lantai ${myRoom.floor}</span>
+                                    <span>${t ? t.filterFloor : "Lantai"} ${myRoom.floor}</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 4px;">
                                     <span style="color: var(--text-muted);">${checkinLabel}</span>
