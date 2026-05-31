@@ -196,9 +196,13 @@ app.post('/api/payments', async (req, res) => {
 app.put('/api/payments/:id', async (req, res) => {
     const { id } = req.params;
     const { status } = req.body; // 'approved' or 'rejected'
+    const updateData = { status };
+    if (status === 'approved') {
+        updateData.created_at = new Date().toISOString();
+    }
     const { data, error } = await supabase
         .from('payments')
-        .update({ status })
+        .update(updateData)
         .eq('id', id)
         .select();
         
