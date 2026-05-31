@@ -4097,13 +4097,8 @@
                         document.body.style.paddingTop = '0px';
                     }
                 })();
-            } else {
-                if (banner) {
-                    banner.remove();
-                    document.body.style.paddingTop = '0px';
-                }
-                
-                // Real-time Lease Expiration Checker (Simulated 3 mins)
+
+                // Real-time Lease Expiration Checker
                 if (window.leaseCheckInterval) clearInterval(window.leaseCheckInterval);
                 window.leaseCheckInterval = setInterval(async () => {
                     try {
@@ -4153,6 +4148,12 @@
                         }
                     } catch(e) {}
                 }, 10000); // Check every 10 seconds
+
+            } else {
+                if (banner) {
+                    banner.remove();
+                    document.body.style.paddingTop = '0px';
+                }
             }
         }
 
