@@ -416,7 +416,7 @@ const init = () => {
         try {
             let res;
             if (isEdit) {
-                res = await fetch(`${API_URL}/rooms/${parseInt(editRoomId.value, 10)}`, {
+                res = await fetch(`${API_URL}/rooms/${editRoomId.value}`, {
                     method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                 });
             } else {

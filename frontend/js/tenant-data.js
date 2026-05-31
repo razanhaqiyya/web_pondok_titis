@@ -127,7 +127,7 @@ const init = () => {
         // Evict/Delete listener
         document.querySelectorAll('.btn-evict-tenant').forEach(btn => {
             btn.addEventListener('click', () => {
-                const tenantId = parseInt(btn.getAttribute('data-id'), 10);
+                const tenantId = btn.getAttribute('data-id');
                 evictTenant(tenantId);
             });
         });
@@ -135,7 +135,7 @@ const init = () => {
         // View detail listener
         document.querySelectorAll('.btn-view-tenant').forEach(btn => {
             btn.addEventListener('click', () => {
-                const tenantId = parseInt(btn.getAttribute('data-id'), 10);
+                const tenantId = btn.getAttribute('data-id');
                 openDetailModal(tenantId);
             });
         });
