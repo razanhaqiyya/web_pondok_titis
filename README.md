@@ -1,4 +1,4 @@
-# SISTEM MANAJEMEN INDEKOS "PONDOK TITIS"
+# SISTEM MANAJEMEN IKOS "PONDOK TITIS"
 > **BERBASIS WEB MENGGUNAKAN ARSITEKTUR CLOUD**
 
 **Kelompok:** Kelompok 1  
@@ -9,7 +9,7 @@
 
 ## 📌 DESKRIPSI APLIKASI
 
-**Web Kosan "Pondok Titis"** adalah aplikasi manajemen indekos berbasis web yang dirancang untuk memudahkan interaksi antara admin (pengelola) dan user (penghuni/calon penghuni). Sistem ini mengimplementasikan arsitektur komputasi awan (*Distributed System*) dengan 3 Virtual Machine: **Database**, **Backend API**, dan **Frontend Web** yang saling terintegrasi.
+**Web Kosan "Pondok Titis"** adalah aplikasi manajemen kos berbasis web yang dirancang untuk memudahkan interaksi antara admin (pengelola) dan user (penghuni/calon penghuni). Sistem ini mengimplementasikan arsitektur komputasi awan (*Distributed System*) dengan 3 Virtual Machine: **Database**, **Backend API**, dan **Frontend Web** yang saling terintegrasi.
 
 ### ✨ Fitur Utama:
 - Manajemen data kamar kos (Tersedia/Terisi)
@@ -36,7 +36,7 @@
   | UI/UX Web Kosan   |
   +-------------------+
            |
-           | Fetch API (AJAX)
+           | Fetch API
            v
   +-------------------+
   | VM Backend        |  Port: 3000
